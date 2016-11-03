@@ -1,13 +1,28 @@
 package com.geniusmart.rxjava;
 
+import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import rx.Observable;
+import rx.schedulers.TestScheduler;
 
 /**
  * Created by geniusmart on 2016/11/2.
  */
 public class FilteringOperatorsTest {
+
+    private TestScheduler mTestScheduler;
+    private List<Object> mList;
+
+    @Before
+    public void setUp() {
+        mTestScheduler = new TestScheduler();
+        mList = new ArrayList<>();
+    }
 
     @Test
     public void distinct(){
@@ -89,12 +104,24 @@ public class FilteringOperatorsTest {
                 .subscribe(System.out::println);
     }
 
-    //TODO 什么鸟东西？
+    //TODO 可以作为范例
+    /**
+     * SkipUntil — discard items emitted by an Observable until a second Observable emits an item
+     */
     @Test
     public void skipUntil(){
-        Observable.just(1,2,3,4,5,6,7,8,9)
-                .skipUntil(Observable.just(0,0))
-                .subscribe(System.out::println);
+
+        Observable<Long> o1 = Observable.interval(100, TimeUnit.SECONDS, mTestScheduler)
+                .map(num->num+1)
+                .take(9)
+                .doOnNext(System.out::println);
+
+        Observable<Integer> o2 = Observable.just(0, 0).delay(550, TimeUnit.SECONDS,mTestScheduler);
+
+        o1.skipUntil(o2)
+                .subscribe(mList::add);
+
+        advanceTimeAndPrint(2000);
     }
 
     @Test
@@ -119,4 +146,8 @@ public class FilteringOperatorsTest {
                 .subscribe(System.out::println);
     }
 
+    private void advanceTimeAndPrint(long delayTime) {
+        mTestScheduler.advanceTimeBy(delayTime, TimeUnit.SECONDS);
+        System.out.println(mList);
+    }
 }
