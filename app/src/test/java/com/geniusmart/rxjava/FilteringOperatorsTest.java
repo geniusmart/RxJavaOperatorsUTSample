@@ -39,6 +39,7 @@ public class FilteringOperatorsTest {
 
     /**
      * find为RxPY操作符，这里使用filter+first来实现
+     * http://rxmarbles.com/#find
      */
     @Test
     public void find(){
