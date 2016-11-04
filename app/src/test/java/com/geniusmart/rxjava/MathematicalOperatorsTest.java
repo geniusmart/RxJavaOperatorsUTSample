@@ -10,11 +10,13 @@ import rx.observables.MathObservable;
  */
 public class MathematicalOperatorsTest {
 
-    //TODO
     @Test
     public void average(){
         Observable<Integer> observable = Observable.just(1, 2, 2, 2, 5);
         MathObservable.averageInteger(observable)
+                .subscribe(System.out::println);
+
+        MathObservable.averageDouble(Observable.just(1.0, 2.0, 2.0, 2.0, 5.0))
                 .subscribe(System.out::println);
     }
 

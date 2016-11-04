@@ -14,6 +14,7 @@ import rx.schedulers.Schedulers;
 import rx.schedulers.TestScheduler;
 
 //TODO code style
+
 /**
  * Created by geniusmart on 2016/11/1.
  */
@@ -29,12 +30,12 @@ public class CombiningOperatorsTest {
     }
 
     @Test
-    public void combineLatest(){
+    public void combineLatest() {
 
         Observable<Integer> observable1 = Observable.create(new Observable.OnSubscribe<Integer>() {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
-                System.out.println("observable1-->"+Thread.currentThread().getName());
+                System.out.println("observable1-->" + Thread.currentThread().getName());
                 subscriber.onNext(1);
                 sleep(500);
                 subscriber.onNext(2);
@@ -53,7 +54,7 @@ public class CombiningOperatorsTest {
         Observable<String> observable2 = Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
-                System.out.println("observable2-->"+Thread.currentThread().getName());
+                System.out.println("observable2-->" + Thread.currentThread().getName());
                 sleep(250);
                 subscriber.onNext("A");
                 sleep(300);
@@ -76,7 +77,7 @@ public class CombiningOperatorsTest {
     }
 
     @Test
-    public void concat(){
+    public void concat() {
         Observable<Integer> observable1 = Observable.interval(10, TimeUnit.SECONDS, mTestScheduler)
                 .map(aLong -> 1)
                 .take(3);
@@ -85,7 +86,7 @@ public class CombiningOperatorsTest {
                 .map(aLong -> 2)
                 .take(2);
 
-        Observable.concat(observable1,observable2)
+        Observable.concat(observable1, observable2)
                 .subscribe(mList::add);
         advanceTimeAndPrint(100);
     }
@@ -100,68 +101,21 @@ public class CombiningOperatorsTest {
                 .take(2)
                 .map(aLong -> 1);
 
-        Observable.merge(observable1,observable2)
+        Observable.merge(observable1, observable2)
                 .subscribe(mList::add);
 
         advanceTimeAndPrint(100);
     }
 
-    //TODO 与结果不一样？？？
     @Test
-    public void sample(){
-
-        Observable<Integer> observable1 = Observable.create(new Observable.OnSubscribe<Integer>() {
-            @Override
-            public void call(Subscriber<? super Integer> subscriber) {
-                subscriber.onNext(1);
-                sleep(500);
-                subscriber.onNext(2);
-                sleep(500);
-                subscriber.onNext(3);
-                sleep(500);
-                subscriber.onNext(4);
-                sleep(500);
-                subscriber.onNext(5);
-                sleep(500);
-                subscriber.onCompleted();
-            }
-        })
-                .subscribeOn(mTestScheduler)
-                .doOnNext(System.out::println);
-
-        Observable<String> observable2 = Observable.create(new Observable.OnSubscribe<String>() {
-            @Override
-            public void call(Subscriber<? super String> subscriber) {
-                sleep(250);
-                subscriber.onNext("A");
-                sleep(300);
-                subscriber.onNext("B");
-                sleep(100);
-                subscriber.onNext("C");
-                sleep(1000);
-                subscriber.onNext("D");
-                subscriber.onCompleted();
-            }
-        })
-                .subscribeOn(Schedulers.newThread())
-                .doOnNext(System.out::println);
-
-
-        observable1.sample(observable2)
-                .subscribe(mList::add);
-
-        advanceTimeAndPrint(10000);
-    }
-
-    @Test
-    public void startWith(){
-        Observable.just(2,3)
+    public void startWith() {
+        Observable.just(2, 3)
                 .startWith(1)
                 .subscribe(System.out::println);
     }
 
     @Test
-    public void withLatestFrom(){
+    public void withLatestFrom() {
         Observable<Integer> observable1 = Observable.create(new Observable.OnSubscribe<Integer>() {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
@@ -202,7 +156,7 @@ public class CombiningOperatorsTest {
     }
 
     @Test
-    public void zip(){
+    public void zip() {
         Observable<Long> observable1 = Observable.interval(5, TimeUnit.SECONDS, mTestScheduler)
                 .skip(1)
                 .take(5);
