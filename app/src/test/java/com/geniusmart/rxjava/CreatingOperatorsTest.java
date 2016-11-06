@@ -42,6 +42,7 @@ public class CreatingOperatorsTest {
                 subscriber.onNext(5);
                 subscriber.onError(new ClassCastException());
                 subscriber.onNext(7);
+                subscriber.onCompleted();
             }
         }).subscribe(new Subscriber<Integer>() {
             @Override
@@ -64,8 +65,35 @@ public class CreatingOperatorsTest {
 
     }
 
+    //TODO-冷热启动，以及connection和publish？
     @Test
     public void defer() {
+
+        class Person{
+            public String name = "nobody";
+
+            public Observable<String> getJustObservable(){
+                return Observable.just(name);
+            }
+
+            public Observable<String> getDeferObservable(){
+                return Observable.defer(this::getJustObservable);
+            }
+        }
+
+        Person person = new Person();
+        Observable<String> justObservable = person.getJustObservable();
+        Observable<String> deferObservable = person.getDeferObservable();
+
+        person.name = "geniusmart";
+
+        justObservable.subscribe(mList::add);
+
+        assertEquals(mList,Collections.singletonList("nobody"));
+
+        mList.clear();
+        deferObservable.subscribe(mList::add);
+        assertEquals(mList,Collections.singletonList("geniusmart"));
 
     }
 
@@ -113,7 +141,7 @@ public class CreatingOperatorsTest {
     }
 
     @Test
-    public void Interval() {
+    public void interval() {
         Observable.interval(100, TimeUnit.MILLISECONDS, mTestScheduler)
                 .subscribe(mList::add);
 
@@ -148,9 +176,16 @@ public class CreatingOperatorsTest {
         assertEquals(mList, Arrays.asList(1, 2, 1, 2, 1, 2));
     }
 
+    //TODO-如何理解
     @Test
     public void repeatWhen() {
-
+//        Observable.just(1)
+//                .repeatWhen(new Func1<Observable<? extends Void>, Observable<?>>() {
+//                    @Override
+//                    public Observable<?> call(Observable<? extends Void> observable) {
+//                        return null;
+//                    }
+//                })
     }
 
     //TODO-更多关于rxjava-async-util的操作符

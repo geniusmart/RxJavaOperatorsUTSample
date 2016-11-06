@@ -17,6 +17,7 @@ import rx.schedulers.TestScheduler;
 
 /**
  * Created by geniusmart on 2016/11/1.
+ * Operators that work with multiple source Observables to create a single Observable
  */
 public class CombiningOperatorsTest {
 
@@ -27,6 +28,21 @@ public class CombiningOperatorsTest {
     public void setUp() {
         mTestScheduler = new TestScheduler();
         mList = new ArrayList<>();
+    }
+
+    //TODO
+    public void and(){
+
+    }
+
+    //TODO
+    public void then(){
+
+    }
+
+    //TODO
+    public void when(){
+
     }
 
     @Test
@@ -76,19 +92,9 @@ public class CombiningOperatorsTest {
         advanceTimeAndPrint(10000);
     }
 
-    @Test
-    public void concat() {
-        Observable<Integer> observable1 = Observable.interval(10, TimeUnit.SECONDS, mTestScheduler)
-                .map(aLong -> 1)
-                .take(3);
+    //TODO
+    public void join(){
 
-        Observable<Integer> observable2 = Observable.interval(1, TimeUnit.SECONDS, mTestScheduler)
-                .map(aLong -> 2)
-                .take(2);
-
-        Observable.concat(observable1, observable2)
-                .subscribe(mList::add);
-        advanceTimeAndPrint(100);
     }
 
     @Test
@@ -112,6 +118,12 @@ public class CombiningOperatorsTest {
         Observable.just(2, 3)
                 .startWith(1)
                 .subscribe(System.out::println);
+    }
+
+    //TODO
+    @Test
+    public void switchOperator(){
+
     }
 
     @Test

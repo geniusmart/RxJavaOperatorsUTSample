@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -15,8 +16,9 @@ import static junit.framework.Assert.assertEquals;
 
 /**
  * Created by geniusmart on 16/11/2.
+ * Operators that originate new Observables.
  */
-public class BooleanAndConditionalOperatorsTest {
+public class ConditionalAndBooleanOperatorsTest {
 
     private TestScheduler mTestScheduler;
     private List<Object> mList;
@@ -32,7 +34,7 @@ public class BooleanAndConditionalOperatorsTest {
      * http://rxmarbles.com/#every
      */
     @Test
-    public void every() {
+    public void all() {
         Observable.just(1, 2, 3, 4, 5)
                 .doOnNext(System.out::println)
                 .all(x -> x < 10)
@@ -45,7 +47,7 @@ public class BooleanAndConditionalOperatorsTest {
      * http://rxmarbles.com/#some
      */
     @Test
-    public void some() {
+    public void exists() {
         Observable.just(2, 30, 22, 5, 60, 1)
                 .doOnNext(System.out::println)
                 .exists(integer -> integer > 10)
@@ -94,6 +96,82 @@ public class BooleanAndConditionalOperatorsTest {
 
         advanceTimeAndPrint(1000);
         assertEquals(mList, Arrays.asList(1, 2, 3));
+    }
+
+    //TODO
+    @Test
+    public void contains(){
+
+    }
+
+    //TODO
+    @Test
+    public void defaultIfEmpty(){
+
+    }
+
+    //TODO 可以作为范例
+
+    /**
+     * SkipUntil — discard items emitted by an Observable until a second Observable emits an item
+     */
+    @Test
+    public void skipUntil() {
+
+        Observable<Long> o1 = Observable.interval(100, TimeUnit.SECONDS, mTestScheduler)
+                .map(num -> num + 1)
+                .take(9)
+                .doOnNext(System.out::println);
+
+        Observable<Integer> o2 = Observable.just(0, 0).delay(550, TimeUnit.SECONDS, mTestScheduler);
+
+        o1.skipUntil(o2)
+                .subscribe(mList::add);
+
+        advanceTimeAndPrint(2000);
+    }
+
+    //TODO
+    @Test
+    public void skipWhile(){
+
+    }
+
+    @Test
+    public void takeUntil() {
+        Observable.just(1, 2, 3, 4)
+                .takeUntil(integer -> integer > 2)
+                .subscribe(mList::add);
+        assertEquals(mList, Arrays.asList(1, 2, 3));
+
+        mList.clear();
+        Observable.just(1, 2, 3, 4)
+                .takeUntil(integer -> integer < 10)
+                .subscribe(mList::add);
+        assertEquals(mList, Collections.singletonList(1));
+    }
+
+    /**
+     * TakeUntil — discard items emitted by an Observable after a second Observable emits an item or terminates
+     * http://rxmarbles.com/#takeUntil
+     */
+    @Test
+    public void takeUntilWithObservable() {
+
+        Observable.interval(0, 100, TimeUnit.MILLISECONDS, mTestScheduler)
+                .skip(1)
+                .takeUntil(Observable.just(0, 0).delay(550, TimeUnit.MILLISECONDS, mTestScheduler))
+                .subscribe(mList::add);
+
+        advanceTimeAndPrint(1000);
+        assertEquals(mList, Arrays.asList(1L, 2L, 3L, 4L, 5L));
+
+    }
+
+    //TODO
+    @Test
+    public void takeWhile(){
+
     }
 
     private void advanceTimeAndPrint(long delayTime) {
