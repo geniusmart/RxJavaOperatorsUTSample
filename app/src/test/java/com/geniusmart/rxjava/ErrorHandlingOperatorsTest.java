@@ -129,16 +129,24 @@ public class ErrorHandlingOperatorsTest {
                     public Observable<?> call(Observable<? extends Throwable> throwable) {
                         return throwable.zipWith(Observable.range(1, 3), new Func2<Throwable, Integer, Object>() {
                             @Override
-                            public Object call(Throwable throwable, Integer integer) {
-                                System.out.println("--->" + integer);
-                                return integer;
+                            public Object call(Throwable throwable, Integer num) {
+                                System.out.println("--->" + num + "-->" + throwable.getMessage());
+                                return num;
+                            }
+                        }).flatMap(new Func1<Object, Observable<?>>() {
+                            @Override
+                            public Observable<?> call(Object o) {
+                                //TODO 这两者的区别是什么？？
+                                //return Observable.just(1);
+                                return Observable.timer(1,TimeUnit.SECONDS);
                             }
                         });
                     }
                 })
                 .doOnNext(System.out::println)
                 .doOnCompleted(() -> System.out.println("completed"))
-                .subscribe(mList::add);
+                .toBlocking()
+                .forEach(mList::add);
 
         assertEquals(mList, Arrays.asList(1, 2, 1, 2, 1, 2, 1, 2));
     }
@@ -155,16 +163,17 @@ public class ErrorHandlingOperatorsTest {
             subscriber.onNext(2);
             subscriber.onError(new RuntimeException("always fails"));
         })
-                .doOnNext(System.out::println)
                 .retryWhen(observable ->
                         observable.zipWith(
                                 Observable.range(1, 3),
-                                (Func2<Throwable, Integer, Integer>) (throwable, integer) -> integer
+                                (Func2<Throwable, Integer, Integer>) (throwable, num) -> num
                         )
                                 .flatMap((Func1<Integer, Observable<?>>) num -> {
                                     System.out.println("delay retry by " + num + " second(s)");
                                     return Observable.timer(num, TimeUnit.SECONDS);
                                 }))
+                .doOnNext(System.out::println)
+                .doOnCompleted(() -> System.out.println("completed"))
                 .toBlocking()
                 .forEach(mList::add);
 
