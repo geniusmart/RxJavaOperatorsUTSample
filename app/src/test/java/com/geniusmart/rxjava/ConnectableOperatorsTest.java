@@ -55,7 +55,8 @@ public class ConnectableOperatorsTest {
     }
 
     /**
-     * instruct a connectable Observable to begin emitting items to its subscribers
+     * TODO-instruct a connectable Observable to begin emitting items to its subscribers
+     * TODO-doOnNext在什么线程
      */
     @Test
     public void connect() {
@@ -78,16 +79,21 @@ public class ConnectableOperatorsTest {
 
         //立刻订阅完整的数据流
         publish.doOnNext(num -> System.out.println("Subscriber1-->" + num))
+                .doOnSubscribe(()->System.out.println("Subscriber1-->开始订阅"))
                 .subscribe(list1::add);
 
 
         //延迟6s后再订阅，将只订阅到3的数据流
-        publish.delaySubscription(6, TimeUnit.SECONDS)
-                .doOnNext(num -> System.out.println("Subscriber2-->" + num))
+        publish.delaySubscription(3, TimeUnit.SECONDS)
+                .doOnSubscribe(()->System.out.println("Subscriber2-->开始订阅"))
+                .doOnNext(num -> {
+                    System.out.println("Subscriber2-->" + num);
+                })
                 .subscribe(list2::add);
 
         // 延迟1s后再订阅,将订阅到完整数据流
-        publish.delaySubscription(1, TimeUnit.SECONDS)
+        publish.delaySubscription(1, TimeUnit.SECONDS,mTestScheduler)
+                .doOnSubscribe(()->System.out.println("Subscriber3-->开始订阅"))
                 .doOnNext(num -> System.out.println("Subscriber3-->" + num))
                 .subscribe(list3::add);
 
@@ -106,6 +112,7 @@ public class ConnectableOperatorsTest {
 
 
         mTestScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
+
         assertEquals(list1, Arrays.asList(1, 2, 3));
         assertEquals(list2, Collections.singletonList(3));
         assertEquals(list3, Arrays.asList(1, 2, 3));
