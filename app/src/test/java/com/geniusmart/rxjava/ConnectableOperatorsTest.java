@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -80,13 +81,13 @@ public class ConnectableOperatorsTest {
                 .subscribe(list1::add);
 
 
-        //延迟8s后再订阅，将只订阅到3的数据流
-        publish.delaySubscription(3, TimeUnit.SECONDS, mTestScheduler)
+        //延迟6s后再订阅，将只订阅到3的数据流
+        publish.delaySubscription(6, TimeUnit.SECONDS)
                 .doOnNext(num -> System.out.println("Subscriber2-->" + num))
                 .subscribe(list2::add);
 
         // 延迟1s后再订阅,将订阅到完整数据流
-        publish.delaySubscription(1, TimeUnit.SECONDS, mTestScheduler)
+        publish.delaySubscription(1, TimeUnit.SECONDS)
                 .doOnNext(num -> System.out.println("Subscriber3-->" + num))
                 .subscribe(list3::add);
 
@@ -105,9 +106,9 @@ public class ConnectableOperatorsTest {
 
 
         mTestScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
-//        assertEquals(list1, Arrays.asList(1L, 2L, 3L));
-//        assertEquals(list2, Collections.singletonList(3L));
-//        assertEquals(list3, Arrays.asList(1L, 2L, 3L));
+        assertEquals(list1, Arrays.asList(1, 2, 3));
+        assertEquals(list2, Collections.singletonList(3));
+        assertEquals(list3, Arrays.asList(1, 2, 3));
     }
 
     @Test
