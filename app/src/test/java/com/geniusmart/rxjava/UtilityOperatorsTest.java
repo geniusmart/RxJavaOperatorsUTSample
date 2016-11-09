@@ -62,6 +62,27 @@ public class UtilityOperatorsTest {
     }
 
     @Test
+    public void delaySubscription(){
+
+        //延时5s订阅
+        Observable.just(888)
+                .delaySubscription(5, TimeUnit.SECONDS,mTestScheduler)
+                .doOnSubscribe(() -> System.out.println("o1->doOnSubscribe"))
+                .doOnNext(System.out::println)
+                .subscribe(mList::add);
+
+        //延时2s订阅，此数据流会先被订阅
+        Observable.just(666)
+                .delaySubscription(2, TimeUnit.SECONDS,mTestScheduler)
+                .doOnSubscribe(() -> System.out.println("o2->doOnSubscribe"))
+                .doOnNext(System.out::println)
+                .subscribe(mList::add);
+
+        mTestScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
+        assertEquals(mList,Arrays.asList(666,888));
+    }
+
+    @Test
     public void doOperator(){
 
     }

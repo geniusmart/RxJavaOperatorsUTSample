@@ -13,8 +13,9 @@ import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Subscriber;
-import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.observables.ConnectableObservable;
+import rx.schedulers.Schedulers;
 import rx.schedulers.TestScheduler;
 
 import static junit.framework.Assert.assertEquals;
@@ -69,49 +70,59 @@ public class ConnectableOperatorsTest {
         ConnectableObservable<Integer> publish = Observable.create(new Observable.OnSubscribe<Integer>() {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
+                //subscriber.onNext(System.currentTimeMillis());
                 subscriber.onNext(1);
                 Utils.sleep(3000);
+                //subscriber.onNext(System.currentTimeMillis());
                 subscriber.onNext(2);
                 Utils.sleep(3000);
+                //subscriber.onNext(System.currentTimeMillis());
                 subscriber.onNext(3);
             }
         }).publish();
 
+        System.out.println("Subscriber1 开始订阅数据"+System.currentTimeMillis());
         //立刻订阅完整的数据流
         publish.doOnNext(num -> System.out.println("Subscriber1-->" + num))
-                .doOnSubscribe(()->System.out.println("Subscriber1-->开始订阅"))
                 .subscribe(list1::add);
 
-
         //延迟6s后再订阅，将只订阅到3的数据流
-        publish.delaySubscription(3, TimeUnit.SECONDS)
-                .doOnSubscribe(()->System.out.println("Subscriber2-->开始订阅"))
-                .doOnNext(num -> {
-                    System.out.println("Subscriber2-->" + num);
+        Observable.timer(6,TimeUnit.SECONDS, Schedulers.newThread())
+                .map((Func1<Long, Object>) aLong -> {
+                    System.out.println("Subscriber2 开始订阅数据"+System.currentTimeMillis());
+                    publish.doOnNext(num -> System.out.println("Subscriber2-->" + num))
+                            .subscribe(list2::add);
+                    return Observable.empty();
                 })
-                .subscribe(list2::add);
+                .subscribe();
 
-        // 延迟1s后再订阅,将订阅到完整数据流
-        publish.delaySubscription(1, TimeUnit.SECONDS,mTestScheduler)
-                .doOnSubscribe(()->System.out.println("Subscriber3-->开始订阅"))
-                .doOnNext(num -> System.out.println("Subscriber3-->" + num))
-                .subscribe(list3::add);
+        //延迟1s后再订阅，将只订阅到3的数据流
+        Observable.timer(1,TimeUnit.SECONDS, Schedulers.newThread())
+                .map((Func1<Long, Object>) aLong -> {
+                    System.out.println("Subscriber3 开始订阅数据"+System.currentTimeMillis()+Thread.currentThread().getName());
+                    publish.doOnNext(num -> System.out.println("Subscriber3-->" + num))
+                            .subscribe(list3::add);
+                    return Observable.empty();
+                })
+                .subscribe();
 
-        //TODO-如何模拟2.5s后调用
-        //publish.connect();
+
+
 
         //延时2s执行connect()
-        Observable.timer(2,TimeUnit.SECONDS, mTestScheduler)
-                .doOnNext(new Action1<Long>() {
-                    @Override
-                    public void call(Long aLong) {
-                        System.out.println("延时2s执行connect()");
-                        publish.connect();
-                    }
-                }).subscribe();
+        Utils.sleep(2000);
+        System.out.println("connect"+System.currentTimeMillis());
+        publish.connect();
+//        Observable.timer(2,TimeUnit.SECONDS, mTestScheduler)
+//                .map((Func1<Long, Object>) aLong -> {
+//                    System.out.println("connect"+System.currentTimeMillis());
+//                    publish.connect();
+//                    return Observable.empty();
+//                })
+//                .subscribe();
 
 
-        mTestScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
+        //mTestScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
 
         assertEquals(list1, Arrays.asList(1, 2, 3));
         assertEquals(list2, Collections.singletonList(3));
