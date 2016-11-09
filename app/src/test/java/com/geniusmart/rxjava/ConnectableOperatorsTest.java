@@ -58,6 +58,7 @@ public class ConnectableOperatorsTest {
     /**
      * TODO-instruct a connectable Observable to begin emitting items to its subscribers
      * TODO-doOnNext在什么线程
+     * 搞清楚测试线程什么时候开始结束，从而影响子线程
      */
     @Test
     public void connect() {
