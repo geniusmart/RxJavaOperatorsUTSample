@@ -82,15 +82,6 @@ public class MathematicalAndAggregateOperatorsTest {
                 .subscribe(System.out::println);
     }
 
-    //TODO:封装
-    private void sleep(long time) {
-        try {
-            Thread.sleep(time);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void advanceTimeAndPrint(long delayTime) {
         mTestScheduler.advanceTimeBy(delayTime, TimeUnit.SECONDS);
         System.out.println(mList);

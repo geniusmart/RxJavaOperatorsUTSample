@@ -1,5 +1,7 @@
 package com.geniusmart.rxjava;
 
+import com.geniusmart.rxjava.utils.Utils;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,17 +43,17 @@ public class FilteringOperatorsTest {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
                 subscriber.onNext(1);
-                sleep(500);
+                Utils.sleep(500);
 
                 subscriber.onNext(2);
-                sleep(100);
+                Utils.sleep(100);
                 subscriber.onNext(3);
-                sleep(200);
+                Utils.sleep(200);
                 subscriber.onNext(4);
-                sleep(300);
+                Utils.sleep(300);
                 subscriber.onNext(5);
 
-                sleep(500);
+                Utils.sleep(500);
                 subscriber.onNext(6);
                 subscriber.onCompleted();
             }
@@ -74,7 +76,7 @@ public class FilteringOperatorsTest {
                 //产生结果的间隔时间分别为100、200、300...900毫秒
                 for (int i = 1; i < 10; i++) {
                     subscriber.onNext(i);
-                    sleep(i * 100);
+                    Utils.sleep(i * 100);
                 }
                 subscriber.onCompleted();
             }
@@ -195,15 +197,15 @@ public class FilteringOperatorsTest {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
                 subscriber.onNext(1);
-                sleep(500);
+                Utils.sleep(500);
                 subscriber.onNext(2);
-                sleep(500);
+                Utils.sleep(500);
                 subscriber.onNext(3);
-                sleep(500);
+                Utils.sleep(500);
                 subscriber.onNext(4);
-                sleep(500);
+                Utils.sleep(500);
                 subscriber.onNext(5);
-                sleep(500);
+                Utils.sleep(500);
                 subscriber.onCompleted();
             }
         })
@@ -213,13 +215,13 @@ public class FilteringOperatorsTest {
         Observable<String> observable2 = Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
-                sleep(250);
+                Utils.sleep(250);
                 subscriber.onNext("A");
-                sleep(300);
+                Utils.sleep(300);
                 subscriber.onNext("B");
-                sleep(100);
+                Utils.sleep(100);
                 subscriber.onNext("C");
-                sleep(1000);
+                Utils.sleep(1000);
                 subscriber.onNext("D");
                 subscriber.onCompleted();
             }
@@ -232,14 +234,6 @@ public class FilteringOperatorsTest {
                 .subscribe(mList::add);
 
         advanceTimeAndPrint(10000);
-    }
-
-    private void sleep(long time) {
-        try {
-            Thread.sleep(time);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     private void advanceTimeAndPrint(long delayTime) {

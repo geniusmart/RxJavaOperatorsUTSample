@@ -1,5 +1,7 @@
 package com.geniusmart.rxjava;
 
+import com.geniusmart.rxjava.utils.Utils;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -53,13 +55,13 @@ public class CombiningOperatorsTest {
             public void call(Subscriber<? super Integer> subscriber) {
                 System.out.println("observable1-->" + Thread.currentThread().getName());
                 subscriber.onNext(1);
-                sleep(500);
+                Utils.sleep(500);
                 subscriber.onNext(2);
-                sleep(1500);
+                Utils.sleep(1500);
                 subscriber.onNext(3);
-                sleep(250);
+                Utils.sleep(250);
                 subscriber.onNext(4);
-                sleep(500);
+                Utils.sleep(500);
                 subscriber.onNext(5);
                 subscriber.onCompleted();
             }
@@ -71,13 +73,13 @@ public class CombiningOperatorsTest {
             @Override
             public void call(Subscriber<? super String> subscriber) {
                 System.out.println("observable2-->" + Thread.currentThread().getName());
-                sleep(250);
+                Utils.sleep(250);
                 subscriber.onNext("A");
-                sleep(300);
+                Utils.sleep(300);
                 subscriber.onNext("B");
-                sleep(500);
+                Utils.sleep(500);
                 subscriber.onNext("C");
-                sleep(100);
+                Utils.sleep(100);
                 subscriber.onNext("D");
                 subscriber.onCompleted();
             }
@@ -132,13 +134,13 @@ public class CombiningOperatorsTest {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
                 subscriber.onNext(1);
-                sleep(500);
+                Utils.sleep(500);
                 subscriber.onNext(2);
-                sleep(1500);
+                Utils.sleep(1500);
                 subscriber.onNext(3);
-                sleep(250);
+                Utils.sleep(250);
                 subscriber.onNext(4);
-                sleep(500);
+                Utils.sleep(500);
                 subscriber.onNext(5);
             }
         })
@@ -148,13 +150,13 @@ public class CombiningOperatorsTest {
         Observable<String> observable2 = Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
-                sleep(250);
+                Utils.sleep(250);
                 subscriber.onNext("A");
-                sleep(300);
+                Utils.sleep(300);
                 subscriber.onNext("B");
-                sleep(500);
+                Utils.sleep(500);
                 subscriber.onNext("C");
-                sleep(100);
+                Utils.sleep(100);
                 subscriber.onNext("D");
             }
         })
@@ -185,13 +187,5 @@ public class CombiningOperatorsTest {
     private void advanceTimeAndPrint(long delayTime) {
         mTestScheduler.advanceTimeBy(delayTime, TimeUnit.SECONDS);
         System.out.println(mList);
-    }
-
-    private void sleep(long time) {
-        try {
-            Thread.sleep(time);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 }

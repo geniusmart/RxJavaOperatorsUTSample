@@ -32,10 +32,85 @@ public class ErrorHandlingOperatorsTest {
         mList = new ArrayList<>();
     }
 
-    //TODO
+    /**
+     * instructs an Observable to emit a particular item when it encounters an error, and then terminate normally
+     */
     @Test
-    public void catchOperator() {
+    public void onErrorReturn() {
+        Observable.create(new Observable.OnSubscribe<Integer>() {
+            @Override
+            public void call(Subscriber<? super Integer> subscriber) {
+                subscriber.onNext(1);
+                subscriber.onNext(2);
+                subscriber.onError(new ArithmeticException());
+            }
+        })
+                .onErrorReturn(throwable -> 3)
+                .subscribe(mList::add);
+        assertEquals(mList, Arrays.asList(1, 2, 3));
+    }
 
+    /**
+     * instructs an Observable to begin emitting a second Observable sequence if it encounters an error
+     */
+    @Test
+    public void onErrorResumeNext() {
+        Observable.create(new Observable.OnSubscribe<Integer>() {
+            @Override
+            public void call(Subscriber<? super Integer> subscriber) {
+                subscriber.onNext(1);
+                subscriber.onNext(2);
+                subscriber.onError(new NullPointerException());
+            }
+        }).onErrorResumeNext(throwable -> {
+            if (throwable instanceof NullPointerException) {
+                return Observable.just(3, 4);
+            }
+            return Observable.just(5, 6);
+        }).subscribe(mList::add);
+
+        assertEquals(mList, Arrays.asList(1, 2, 3, 4));
+    }
+
+    /**
+     * instructs an Observable to begin emitting a second Observable sequence if it encounters an error
+     */
+    @Test
+    public void onErrorResumeNext2() {
+        Observable.create(new Observable.OnSubscribe<Integer>() {
+            @Override
+            public void call(Subscriber<? super Integer> subscriber) {
+                subscriber.onNext(1);
+                subscriber.onNext(2);
+                subscriber.onError(new NullPointerException());
+            }
+        })
+                .onErrorResumeNext(Observable.just(3))
+                .subscribe(mList::add);
+        assertEquals(mList, Arrays.asList(1, 2, 3));
+    }
+
+    /**
+     * instructs an Observable to continue emitting items after it encounters an exception (but not another variety of throwable)
+     */
+    @Test
+    public void onExceptionResumeNext() {
+        Observable.create(new Observable.OnSubscribe<Integer>() {
+            @Override
+            public void call(Subscriber<? super Integer> subscriber) {
+                subscriber.onNext(1);
+                subscriber.onNext(2);
+                subscriber.onError(new Throwable("throwable"));
+            }
+        })
+                .onExceptionResumeNext(Observable.just(4))
+                .subscribe(
+                        mList::add,
+                        throwable -> System.out.println(throwable.getMessage())
+                );
+
+        //onExceptionResumeNext只处理Exception类型的error，其他类型(如Error和Throwable)的异常不进行处理
+        assertEquals(mList, Arrays.asList(1, 2));
     }
 
     @Test
@@ -111,7 +186,7 @@ public class ErrorHandlingOperatorsTest {
     }
 
     /**
-     * TODO：使用zip() + range()实现有限次数的重订阅
+     * TODO：使用zip() + range()实现有限次数的重订阅(与预期结果不一致)
      */
     @Test
     public void retryWhen_zip_range() {
@@ -137,8 +212,8 @@ public class ErrorHandlingOperatorsTest {
                             @Override
                             public Observable<?> call(Object o) {
                                 //TODO 这两者的区别是什么？？
-                                //return Observable.just(1);
-                                return Observable.timer(1,TimeUnit.SECONDS);
+                                return Observable.just(o);
+                                //return Observable.timer(1,TimeUnit.SECONDS);
                             }
                         });
                     }

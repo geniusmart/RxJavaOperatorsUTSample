@@ -74,12 +74,4 @@ public class TransformingOperatorsTest {
         mTestScheduler.advanceTimeBy(delayTime, TimeUnit.SECONDS);
         System.out.println(mList);
     }
-
-    private void sleep(long time) {
-        try {
-            Thread.sleep(time);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 }
