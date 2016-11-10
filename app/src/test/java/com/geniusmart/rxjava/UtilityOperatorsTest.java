@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
-import rx.functions.Func1;
 import rx.schedulers.TestScheduler;
 
 import static junit.framework.Assert.assertEquals;
@@ -30,6 +29,12 @@ public class UtilityOperatorsTest {
         mList = new ArrayList<>();
     }
 
+    /**
+     * shift the emissions from an Observable forward in time by a particular amount
+     * <p>
+     * 此例子根据RxMarbles进行实现
+     * @see <a href="http://rxmarbles.com/#delay">delay diagrams
+     */
     @Test
     public void delay() {
         Observable.just(1, 2, 1)
@@ -40,100 +45,101 @@ public class UtilityOperatorsTest {
         System.out.println("after 2000ms,result = " + mList);
         assertTrue(mList.isEmpty());
 
-        mTestScheduler.advanceTimeBy(3000, TimeUnit.SECONDS);
-        System.out.println("after 2000ms,result = " + mList);
+        mTestScheduler.advanceTimeBy(1000, TimeUnit.SECONDS);
+        System.out.println("after 3000ms,result = " + mList);
         assertEquals(mList, Arrays.asList(1, 2, 1));
 
     }
 
-    //TODO：RxJs的操作符
+    /**
+     * shift the emissions from an Observable forward in time by a particular amount
+     * <p>
+     * 此例子根据RxMarbles进行实现
+     * @see <a href="http://rxmarbles.com/#delayWithSelector">delayWithSelector diagrams
+     */
     @Test
     public void delayWithSelector() {
 
         Observable.just(1, 2, 1)
-                .delay(new Func1<Integer, Observable<Long>>() {
-                    @Override
-                    public Observable<Long> call(Integer integer) {
-                        return Observable.timer(integer * 20, TimeUnit.SECONDS);
-                    }
-                }).subscribe(mList::add);
+                .delay(integer -> Observable.timer(integer * 20, TimeUnit.SECONDS, mTestScheduler))
+                .subscribe(mList::add);
         mTestScheduler.advanceTimeBy(3000, TimeUnit.SECONDS);
-        System.out.println("after 2000ms,result = " + mList);
+        assertEquals(mList, Arrays.asList(1, 1, 2));
     }
 
     @Test
-    public void delaySubscription(){
+    public void delaySubscription() {
 
         //延时5s订阅
         Observable.just(888)
-                .delaySubscription(5, TimeUnit.SECONDS,mTestScheduler)
+                .delaySubscription(5, TimeUnit.SECONDS, mTestScheduler)
                 .doOnSubscribe(() -> System.out.println("o1->doOnSubscribe"))
                 .doOnNext(System.out::println)
                 .subscribe(mList::add);
 
         //延时2s订阅，此数据流会先被订阅
         Observable.just(666)
-                .delaySubscription(2, TimeUnit.SECONDS,mTestScheduler)
+                .delaySubscription(2, TimeUnit.SECONDS, mTestScheduler)
                 .doOnSubscribe(() -> System.out.println("o2->doOnSubscribe"))
                 .doOnNext(System.out::println)
                 .subscribe(mList::add);
 
         mTestScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
-        assertEquals(mList,Arrays.asList(666,888));
+        assertEquals(mList, Arrays.asList(666, 888));
     }
 
     @Test
-    public void doOperator(){
-
-    }
-
-    @Test
-    public void materialize(){
+    public void doOperator() {
 
     }
 
     @Test
-    public void dematerialize(){
+    public void materialize() {
 
     }
 
     @Test
-    public void observeOn(){
+    public void dematerialize() {
 
     }
 
     @Test
-    public void serialize(){
+    public void observeOn() {
 
     }
 
     @Test
-    public void subscribe(){
+    public void serialize() {
 
     }
 
     @Test
-    public void subscribeOn(){
+    public void subscribe() {
 
     }
 
     @Test
-    public void timeInterval(){
+    public void subscribeOn() {
 
     }
 
     @Test
-    public void timeout(){
+    public void timeInterval() {
 
     }
 
     @Test
-    public void timestamp(){
+    public void timeout() {
 
     }
 
     @Test
-    public void using(){
+    public void timestamp() {
+
+    }
+
+    @Test
+    public void using() {
 
     }
 }
