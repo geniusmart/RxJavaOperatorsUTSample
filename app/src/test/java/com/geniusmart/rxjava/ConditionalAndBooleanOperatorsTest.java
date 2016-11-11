@@ -30,113 +30,152 @@ public class ConditionalAndBooleanOperatorsTest {
     }
 
     /**
-     * RxJs的every操作符相当于RxJava的all
-     * http://rxmarbles.com/#every
+     * determine whether all items emitted by an Observable meet some criteria
+     *
+     * @see <a href="http://rxmarbles.com/#every">RxMarbles diagrams all</a>
      */
     @Test
     public void all() {
         Observable.just(1, 2, 3, 4, 5)
                 .doOnNext(System.out::println)
                 .all(x -> x < 10)
-                .subscribe(System.out::println);
+                .subscribe(mList::add);
+        assertEquals(mList, Collections.singletonList(true));
     }
 
-    //TODO--可以作为例子，一旦符合条件则停止发射
     /**
-     * RxJs的some操作符相当于RxJava的exists
-     * http://rxmarbles.com/#some
+     * @see <a href="http://rxmarbles.com/#some">RxMarbles diagrams exists</a>
      */
     @Test
     public void exists() {
         Observable.just(2, 30, 22, 5, 60, 1)
                 .doOnNext(System.out::println)
                 .exists(integer -> integer > 10)
-                .subscribe(System.out::println);
+                .subscribe(mList::add);
+        assertEquals(mList, Collections.singletonList(true));
     }
 
     /**
-     * includes相当于RxJava的contains
-     * http://rxmarbles.com/#includes
+     * determine whether an Observable emits a particular item or not
+     *
+     * @see <a href="http://rxmarbles.com/#includes">RxMarbles diagrams contains</a>
      */
     @Test
-    public void includes() {
+    public void contains() {
         Observable.just(2, 30, 22, 5, 60, 1)
                 .contains(22)
-                .subscribe(System.out::println);
+                .subscribe(mList::add);
+        assertEquals(mList, Collections.singletonList(true));
     }
 
-    //TODO--可以作为范例
     /**
-     * SequenceEqual — determine whether two Observables emit the same sequence of items
+     * determine whether two Observables emit the same sequence of items
+     *
+     * @see <a href="http://rxmarbles.com/#sequenceEqual">RxMarbles diagrams exists</a>
      */
     @Test
     public void sequenceEqual() {
 
-        Observable<Long> o1 = Observable.just(1L, 2L, 3L)
-                .delay(1000, TimeUnit.MILLISECONDS, mTestScheduler);
-        Observable<Long> o2 = Observable.interval(20, TimeUnit.MILLISECONDS, mTestScheduler)
+        Observable<Long> o1 = Observable.just(1L, 2L, 3L, 4L, 5L)
+                .delay(1000, TimeUnit.SECONDS, mTestScheduler);
+        Observable<Long> o2 = Observable.interval(20, TimeUnit.SECONDS, mTestScheduler)
                 .skip(1)
-                .take(3);
+                .take(5);
 
         Observable.sequenceEqual(o1, o2)
                 .subscribe(mList::add);
-        advanceTimeAndPrint(1000);
+
+        mTestScheduler.advanceTimeBy(1200, TimeUnit.SECONDS);
+
+        assertEquals(mList, Collections.singletonList(true));
+
     }
 
     /**
-     * Amb — given two or more source Observables, emit all of the items from only the first of these Observables to emit an item
+     * given two or more source Observables, emit all of the items from only the first of these
+     * Observables to emit an item
+     *
+     * @see <a href="http://rxmarbles.com/#amb">RxMarbles diagrams amb</a>
      */
     @Test
     public void amb() {
-        Observable<Integer> o1 = Observable.just(20, 40, 60).delay(500, TimeUnit.MILLISECONDS, mTestScheduler);
-        Observable<Integer> o2 = Observable.just(1, 2, 3).delay(200, TimeUnit.MILLISECONDS, mTestScheduler);
-        Observable<Integer> o3 = Observable.just(0, 0, 0).delay(1000, TimeUnit.MILLISECONDS, mTestScheduler);
+        Observable<Integer> o1 = Observable.just(20, 40, 60)
+                .delay(500, TimeUnit.SECONDS, mTestScheduler);
+
+        Observable<Integer> o2 = Observable.just(1, 2, 3)
+                .delay(200, TimeUnit.SECONDS, mTestScheduler);
+
+        Observable<Integer> o3 = Observable.just(0, 0, 0)
+                .delay(1000, TimeUnit.SECONDS, mTestScheduler);
+
         Observable.amb(o1, o2, o3)
                 .subscribe(mList::add);
 
-        advanceTimeAndPrint(1000);
+        mTestScheduler.advanceTimeBy(1000, TimeUnit.SECONDS);
         assertEquals(mList, Arrays.asList(1, 2, 3));
     }
 
-    //TODO
+    /**
+     * emit items from the source Observable, or a default item if the source Observable
+     * emits nothing
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/defaultifempty.html">
+     * defaultIfEmpty</a>
+     */
     @Test
-    public void contains(){
-
-    }
-
-    //TODO
-    @Test
-    public void defaultIfEmpty(){
-
+    public void defaultIfEmpty() {
+        Observable.empty()
+                .defaultIfEmpty("geniusmart")
+                .subscribe(mList::add);
+        assertEquals(mList, Collections.singletonList("geniusmart"));
     }
 
     //TODO 可以作为范例
 
     /**
-     * SkipUntil — discard items emitted by an Observable until a second Observable emits an item
+     * discard items emitted by an Observable until a second Observable emits an item
+     *
+     * @see <a href="http://rxmarbles.com/#skipUntil">RxMarbles diagrams skipUntil</a>
      */
     @Test
     public void skipUntil() {
 
         Observable<Long> o1 = Observable.interval(100, TimeUnit.SECONDS, mTestScheduler)
                 .map(num -> num + 1)
-                .take(9)
-                .doOnNext(System.out::println);
+                .take(9);
 
-        Observable<Integer> o2 = Observable.just(0, 0).delay(550, TimeUnit.SECONDS, mTestScheduler);
+        Observable<Integer> o2 = Observable.just(0, 0)
+                .delay(550, TimeUnit.SECONDS, mTestScheduler);
 
         o1.skipUntil(o2)
                 .subscribe(mList::add);
 
-        advanceTimeAndPrint(2000);
+        mTestScheduler.advanceTimeBy(2000, TimeUnit.SECONDS);
+        assertEquals(mList, Arrays.asList(6L, 7L, 8L, 9L));
     }
 
-    //TODO
+    /**
+     * discard items emitted by an Observable until a specified condition becomes false
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/skipwhile.html">
+     * skipWhile</a>
+     */
     @Test
-    public void skipWhile(){
+    public void skipWhile() {
+        Observable.interval(100, TimeUnit.SECONDS, mTestScheduler)
+                .map(num -> num + 1)
+                .take(7)
+                .skipWhile(aLong -> aLong != 4)
+                .subscribe(mList::add);
 
+        mTestScheduler.advanceTimeBy(1000, TimeUnit.SECONDS);
+        assertEquals(mList, Arrays.asList(4L, 5L, 6L, 7L));
     }
 
+    /**
+     * discard items emitted by an Observable after a second Observable emits an item or
+     * terminates
+     */
     @Test
     public void takeUntil() {
         Observable.just(1, 2, 3, 4)
@@ -152,31 +191,42 @@ public class ConditionalAndBooleanOperatorsTest {
     }
 
     /**
-     * TakeUntil — discard items emitted by an Observable after a second Observable emits an item or terminates
-     * http://rxmarbles.com/#takeUntil
+     * TakeUntil — discard items emitted by an Observable after a second Observable emits an
+     * item or terminates
+     *
+     * @see <a href="http://rxmarbles.com/#takeUntil">RxMarbles diagrams takeUntil</a>
      */
     @Test
     public void takeUntilWithObservable() {
 
+        Observable<Integer> observable = Observable.just(0, 0)
+                .delay(550, TimeUnit.MILLISECONDS, mTestScheduler);
+
         Observable.interval(0, 100, TimeUnit.MILLISECONDS, mTestScheduler)
                 .skip(1)
-                .takeUntil(Observable.just(0, 0).delay(550, TimeUnit.MILLISECONDS, mTestScheduler))
+                .takeUntil(observable)
                 .subscribe(mList::add);
 
-        advanceTimeAndPrint(1000);
+        mTestScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
         assertEquals(mList, Arrays.asList(1L, 2L, 3L, 4L, 5L));
 
     }
 
-    //TODO
+    /**
+     * discard items emitted by an Observable after a specified condition becomes false
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/takewhile.html">
+     * takeWhile</a>
+     */
     @Test
-    public void takeWhile(){
+    public void takeWhile() {
+        Observable.interval(100, TimeUnit.SECONDS, mTestScheduler)
+                .map(num -> num + 1)
+                .take(7)
+                .takeWhile(aLong -> aLong != 4)
+                .subscribe(mList::add);
 
+        mTestScheduler.advanceTimeBy(1000, TimeUnit.SECONDS);
+        assertEquals(mList, Arrays.asList(1L, 2L, 3L));
     }
-
-    private void advanceTimeAndPrint(long delayTime) {
-        mTestScheduler.advanceTimeBy(delayTime, TimeUnit.SECONDS);
-        System.out.println(mList);
-    }
-
 }

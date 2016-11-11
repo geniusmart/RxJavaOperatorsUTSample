@@ -32,6 +32,12 @@ public class CreatingOperatorsTest {
         mList = new ArrayList<>();
     }
 
+    /**
+     * create an Observable from scratch by calling observer methods programmatically
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/create.html">
+     * ReactiveX operators documentation: Create</a>
+     */
     @Test
     public void create() {
         Observable.create(new Observable.OnSubscribe<Integer>() {
@@ -69,14 +75,14 @@ public class CreatingOperatorsTest {
     @Test
     public void defer() {
 
-        class Person{
+        class Person {
             public String name = "nobody";
 
-            public Observable<String> getJustObservable(){
+            public Observable<String> getJustObservable() {
                 return Observable.just(name);
             }
 
-            public Observable<String> getDeferObservable(){
+            public Observable<String> getDeferObservable() {
                 return Observable.defer(this::getJustObservable);
             }
         }
@@ -89,11 +95,11 @@ public class CreatingOperatorsTest {
 
         justObservable.subscribe(mList::add);
 
-        assertEquals(mList,Collections.singletonList("nobody"));
+        assertEquals(mList, Collections.singletonList("nobody"));
 
         mList.clear();
         deferObservable.subscribe(mList::add);
-        assertEquals(mList,Collections.singletonList("geniusmart"));
+        assertEquals(mList, Collections.singletonList("geniusmart"));
 
     }
 
@@ -205,12 +211,12 @@ public class CreatingOperatorsTest {
     public void timer() {
 
         //仅发射0的数值，延迟100s
-        Observable.timer(100,TimeUnit.SECONDS,mTestScheduler)
+        Observable.timer(100, TimeUnit.SECONDS, mTestScheduler)
                 .subscribe(mList::add);
 
         assertTrue(mList.isEmpty());
 
-        mTestScheduler.advanceTimeBy(100,TimeUnit.SECONDS);
+        mTestScheduler.advanceTimeBy(100, TimeUnit.SECONDS);
         assertEquals(mList, Collections.singletonList(0L));
     }
 

@@ -35,6 +35,8 @@ public class ConnectableOperatorsTest {
 
     /**
      * convert an ordinary Observable into a connectable Observable
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/connect.html">publish</a>
      */
     @Test
     public void publish() {
@@ -55,9 +57,9 @@ public class ConnectableOperatorsTest {
     /**
      * TODO-autoConnect的作用？
      * instruct a connectable Observable to begin emitting items to its subscribers
-     * <p>
+     * <p/>
      * 此例子根据connect的官方宝蓝图进行实现
-     * @see <a href="http://reactivex.io/documentation/operators/images/publishConnect.png">ReactiveX operators: connect</a>
+     * @see <a href="http://reactivex.io/documentation/operators/images/publishConnect.png">connect</a>
      */
     @Test
     public void connect() {
@@ -117,7 +119,9 @@ public class ConnectableOperatorsTest {
     /**
      * TODO-refCount未完成
      * make a Connectable Observable behave like an ordinary Observable
+     * <p/>
      * 此例子根据connect的官方宝蓝图进行实现
+     *
      * @see <a href="http://reactivex.io/documentation/operators/images/publishRefCount.c.png">ReactiveX operators: RefCount</a>
      */
     @Test
@@ -140,6 +144,7 @@ public class ConnectableOperatorsTest {
      * ensure that all observers see the same sequence of emitted items, even if they subscribe after the Observable has begun emitting items
      * <p>
      * 此例子根据replay的官方宝蓝图进行实现
+     *
      * @see <a href="http://reactivex.io/documentation/operators/images/replay.png">ReactiveX operators: replay</a>
      */
     @Test
