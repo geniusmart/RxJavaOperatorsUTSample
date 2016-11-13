@@ -14,8 +14,9 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.functions.Action1;
+import rx.functions.Func0;
+import rx.functions.Func1;
 import rx.schedulers.TestScheduler;
-import rx.schedulers.TimeInterval;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
@@ -200,7 +201,7 @@ public class UtilityOperatorsTest {
      * documentation: Do</a>
      */
     @Test
-    public void doAfter() {
+    public void doAfterTerminate() {
         Observable.just(1, 2, 3, 4, 5, 6)
                 .doAfterTerminate(() -> mList.add("doAfterTerminate"))
                 .subscribe(mList::add);
@@ -237,7 +238,7 @@ public class UtilityOperatorsTest {
                 .dematerialize()
                 .doOnNext(System.out::println)
                 .subscribe(mList::add);
-        assertEquals(mList,Arrays.asList(1,2));
+        assertEquals(mList, Arrays.asList(1, 2));
     }
 
     @Test
@@ -248,6 +249,7 @@ public class UtilityOperatorsTest {
     /**
      * TODO-serialize
      * force an Observable to make serialized calls and to be well-behaved
+     *
      * @see <a href="http://reactivex.io/documentation/operators/serialize.html">ReactiveX operators documentation: Serialize</a>
      */
     @Test
@@ -287,30 +289,92 @@ public class UtilityOperatorsTest {
                 subscriber.onCompleted();
             }
         })
-                .subscribeOn(mTestScheduler)
                 .take(5)
                 .timeInterval()
-                .subscribe(new Action1<TimeInterval<Integer>>() {
-                    @Override
-                    public void call(TimeInterval<Integer> timeInterval) {
-                        System.out.println(timeInterval);
-                    }
-                });
-        mTestScheduler.advanceTimeBy(1,TimeUnit.SECONDS);
+                .subscribe(System.out::println);
     }
 
+    /**
+     * mirror the source Observable, but issue an error notification if a particular period of
+     * time elapses without any emitted items
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/timeout.html">ReactiveX operators
+     * documentation: Timeout</a>
+     */
     @Test
     public void timeout() {
+        Observable.create(new Observable.OnSubscribe<Integer>() {
+            @Override
+            public void call(Subscriber<? super Integer> subscriber) {
+                subscriber.onNext(1);
+                subscriber.onNext(2);
+                subscriber.onNext(3);
+                subscriber.onNext(4);
+                Utils.sleep(3000);
+                subscriber.onNext(5);
+                subscriber.onCompleted();
+            }
+        })
+                .subscribeOn(mTestScheduler)
+                .timeout(2, TimeUnit.SECONDS)
+                .doOnError(System.out::println)
+                .subscribe(num -> {
+                    mList.add(num);
+                }, throwable -> {
+                    mList.add("throwable");
+                });
 
+        mTestScheduler.advanceTimeBy(1, TimeUnit.SECONDS);
+        assertEquals(mList, Arrays.asList(1, 2, 3, 4, "throwable"));
     }
 
+    /**
+     * attach a timestamp to each item emitted by an Observable indicating when it was emitted
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/timestamp.html">ReactiveX operators documentation: Timestamp</a>
+     */
     @Test
     public void timestamp() {
-
+        System.out.println("start=" + System.currentTimeMillis());
+        Observable.create(new Observable.OnSubscribe<Integer>() {
+            @Override
+            public void call(Subscriber<? super Integer> subscriber) {
+                subscriber.onNext(1);
+                Utils.sleep(1000);
+                subscriber.onNext(2);
+                Utils.sleep(3000);
+                subscriber.onNext(3);
+                subscriber.onCompleted();
+            }
+        })
+                .timestamp()
+                .subscribe(System.out::println);
+        System.out.println("end" + System.currentTimeMillis());
     }
 
+    /**
+     * TODO-USING
+     * create a disposable resource that has the same lifespan as the Observable
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/using.html">ReactiveX operators documentation: Using</a>
+     */
     @Test
     public void using() {
+        Observable.using(new Func0<Object>() {
+            @Override
+            public Object call() {
+                return null;
+            }
+        }, new Func1<Object, Observable<?>>() {
+            @Override
+            public Observable<?> call(Object o) {
+                return null;
+            }
+        }, new Action1<Object>() {
+            @Override
+            public void call(Object o) {
 
+            }
+        }).subscribe(System.out::println);
     }
 }
