@@ -75,7 +75,7 @@ public class TransformingOperatorsTest {
         assertEquals(mList, expectedList);
     }
 
-    //TODO
+    //TODO-bufferClosingSelector
     @Test
     public void bufferClosingSelector() {
 
@@ -273,8 +273,6 @@ public class TransformingOperatorsTest {
         assertEquals(mList, Arrays.asList(1, 3, 6, 10, 15));
 
     }
-
-    //TODO 与背压的关系？？
 
     /**
      * periodically subdivide items from an Observable into Observable windows and emit

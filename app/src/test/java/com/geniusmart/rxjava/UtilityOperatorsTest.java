@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
+import rx.Subscriber;
+import rx.Subscription;
+import rx.functions.Action1;
 import rx.schedulers.TestScheduler;
 
 import static junit.framework.Assert.assertEquals;
@@ -34,7 +37,9 @@ public class UtilityOperatorsTest {
      * shift the emissions from an Observable forward in time by a particular amount
      * <p>
      * 此例子根据RxMarbles进行实现
+     *
      * @see <a href="http://rxmarbles.com/#delay">delay diagrams
+     * @see <a href="http://reactivex.io/documentation/operators/delay.html">ReactiveX operators documentation: Delay</a>
      */
     @Test
     public void delay() {
@@ -56,6 +61,7 @@ public class UtilityOperatorsTest {
      * shift the emissions from an Observable forward in time by a particular amount
      * <p>
      * 此例子根据RxMarbles进行实现
+     *
      * @see <a href="http://rxmarbles.com/#delayWithSelector">delayWithSelector diagrams
      */
     @Test
@@ -68,6 +74,11 @@ public class UtilityOperatorsTest {
         assertEquals(mList, Arrays.asList(1, 1, 2));
     }
 
+    /**
+     * Returns an Observable that delays the subscription to the source Observable by a given amount of time.
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/delay.html">ReactiveX operators documentation: Delay</a>
+     */
     @Test
     public void delaySubscription() {
 
@@ -89,19 +100,141 @@ public class UtilityOperatorsTest {
         assertEquals(mList, Arrays.asList(666, 888));
     }
 
+    /**
+     * register an action to take upon a variety of Observable lifecycle events
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/do.html">ReactiveX operators
+     * documentation: Do</a>
+     */
     @Test
-    public void doOperator() {
+    public void doOnSubscribe_doOnNext_doOnCompleted__doOnUnsubscribe() {
+        Subscription subscribe = Observable.just(1, 2, 3)
+                .doOnCompleted(() -> mList.add("doOnCompleted"))
+                .doOnNext(mList::add)
+                .doOnSubscribe(() -> mList.add("doOnSubscribe"))
+                .doOnUnsubscribe(() -> mList.add("doOnUnsubscribe"))
+                .subscribe();
+
+        subscribe.unsubscribe();
+
+        assertEquals(mList, Arrays.asList("doOnSubscribe", 1, 2, 3, "doOnCompleted", "doOnUnsubscribe"));
 
     }
 
+    //TODO-doOnRequest-参考http://blog.chengyunfeng.com/?p=981
+    @Test
+    public void doOnRequest() {
+        Observable.just(1, 2, 3, 4, 5, 6)
+                .doOnRequest(new Action1<Long>() {
+                    @Override
+                    public void call(Long aLong) {
+                    }
+                });
+    }
+
+    /**
+     * register an action to take upon a variety of Observable lifecycle events
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/do.html">ReactiveX operators
+     * documentation: Do</a>
+     */
+    @Test
+    public void doOnEach_doOnError() {
+        Observable.create(new Observable.OnSubscribe<Integer>() {
+            @Override
+            public void call(Subscriber<? super Integer> subscriber) {
+                subscriber.onNext(1);
+                subscriber.onNext(5 / 0);
+            }
+        })
+                .doOnEach(notification -> {
+                    String actionName = notification.getKind().name();
+                    Object value = notification.getValue();
+                    System.out.println("doOnEach--" + actionName + "->" + value);
+                })
+                .doOnError(throwable -> System.out.println("doOnError->" + throwable.getMessage()))
+                .subscribe(
+                        num -> {
+                            System.out.println("subscribe--" + num);
+                        },
+                        throwable -> {
+                            System.out.println("subscribe--" + throwable.getMessage());
+                        }
+                );
+    }
+
+    /**
+     * registers an Action which will be called just before the resulting Observable terminates,
+     * whether normally or with an error.
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/do.html">ReactiveX operators
+     * documentation: Do</a>
+     */
+    @Test
+    public void doOnTerminate() {
+        Observable.just(1)
+                .doOnTerminate(() -> mList.add("doOnTerminate by Completed"))
+                .subscribe();
+
+        Observable.create(subscriber -> {
+            subscriber.onError(new Exception("null"));
+        })
+                .doOnTerminate(() -> mList.add("doOnTerminate by Error"))
+                .subscribe(
+                        num -> {
+                        },
+                        throwable -> {
+                        });
+
+        assertEquals(mList, Arrays.asList("doOnTerminate by Completed", "doOnTerminate by Error"));
+    }
+
+    /**
+     * The doAfterTerminate operator registers an Action which will be called just after the
+     * resulting Observable terminates, whether normally or with an error.
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/do.html">ReactiveX operators
+     * documentation: Do</a>
+     */
+    @Test
+    public void doAfter() {
+        Observable.just(1, 2, 3, 4, 5, 6)
+                .doAfterTerminate(() -> mList.add("doAfterTerminate"))
+                .subscribe(mList::add);
+
+        assertEquals(mList, Arrays.asList(1, 2, 3, 4, 5, 6, "doAfterTerminate"));
+    }
+
+    /**
+     * represent both the items emitted and the notifications sent as emitted items, or reverse this process
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/materialize-dematerialize.html">ReactiveX operators documentation: Materialize</a>
+     */
     @Test
     public void materialize() {
-
+        Observable.just(1, 2)
+                .materialize()
+                .doOnNext(System.out::println)
+                .subscribe(notification -> {
+                    mList.add(notification.getKind().name() + "->" + notification.getValue());
+                });
+        assertEquals(mList, Arrays.asList("OnNext->1", "OnNext->2", "OnCompleted->null"));
     }
 
+    /**
+     * represent both the items emitted and the notifications sent as emitted items, or reverse this process
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/materialize-dematerialize.html">ReactiveX operators documentation: Materialize</a>
+     */
     @Test
     public void dematerialize() {
-
+        Observable.just(1, 2)
+                .materialize()
+                .doOnNext(System.out::println)
+                .dematerialize()
+                .doOnNext(System.out::println)
+                .subscribe(mList::add);
+        assertEquals(mList,Arrays.asList(1,2));
     }
 
     @Test
@@ -109,6 +242,11 @@ public class UtilityOperatorsTest {
 
     }
 
+    /**
+     * TODO-serialize
+     * force an Observable to make serialized calls and to be well-behaved
+     * @see <a href="http://reactivex.io/documentation/operators/serialize.html">ReactiveX operators documentation: Serialize</a>
+     */
     @Test
     public void serialize() {
 

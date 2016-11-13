@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -65,7 +66,7 @@ public class FilteringOperatorsTest {
                 .subscribe(mList::add);
 
         advanceTimeAndPrint(10000);
-        assertEquals(mList,Arrays.asList(1,5,6));
+        assertEquals(mList, Arrays.asList(1, 5, 6));
     }
 
     //TODO-如何理解
@@ -136,10 +137,19 @@ public class FilteringOperatorsTest {
                 .subscribe(System.out::println);
     }
 
-    //TODO
+    /**
+     * do not emit any items from an Observable but mirror its termination notification
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/ignoreelements.html">ReactiveX
+     * operators documentation: IgnoreElements</a>
+     */
     @Test
-    public void IgnoreElements(){
-
+    public void IgnoreElements() {
+        Observable.just(1, 2, 3, 4, 5, 6)
+                .ignoreElements()
+                .doOnCompleted(() -> mList.add("Completed"))
+                .subscribe(mList::add);
+        assertEquals(mList, Collections.singletonList("Completed"));
     }
 
 
@@ -148,18 +158,6 @@ public class FilteringOperatorsTest {
         Observable.just(1, 2, 3, 4)
                 .last()
                 .subscribe(System.out::println);
-    }
-
-    //TODO-此为RxJs的操作符
-    @Test
-    public void pausable() {
-        Observable.just(1);
-    }
-
-    //TODO
-    @Test
-    public void pausableBuffered() {
-
     }
 
     @Test
@@ -192,7 +190,7 @@ public class FilteringOperatorsTest {
 
     //TODO 与结果不一样？？？
     @Test
-    public void sample(){
+    public void sample() {
 
         Observable<Integer> observable1 = Observable.create(new Observable.OnSubscribe<Integer>() {
             @Override

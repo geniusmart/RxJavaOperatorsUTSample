@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Subscriber;
+import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.joins.Plan0;
 import rx.observables.JoinObservable;
@@ -65,11 +66,12 @@ public class CombiningOperatorsTest {
                 .toObservable()
                 .subscribe(mList::add);
 
-        mTestScheduler.advanceTimeBy(50,TimeUnit.SECONDS);
+        mTestScheduler.advanceTimeBy(50, TimeUnit.SECONDS);
         assertEquals(mList, Arrays.asList("1A", "2B", "3C", "4D"));
     }
 
     /**
+     * TODO:时间提前的原理
      * when an item is emitted by either of two Observables, combine the latest
      * item emitted by each Observable via a specified function and emit items
      * based on the results of this function
@@ -120,25 +122,98 @@ public class CombiningOperatorsTest {
                 (Func2<Integer, String, Object>) (integer, s) -> integer + s)
                 .subscribe(mList::add);
 
-        //测试线程提前一定时间，让数据流能顺利完成订阅
-        mTestScheduler.advanceTimeBy(10, TimeUnit.MILLISECONDS);
+        //测试线程提前一定时间，让observable能顺利开始发送数据 TODO,不会阻塞线程--？？
+        mTestScheduler.advanceTimeBy(1, TimeUnit.MILLISECONDS);
         System.out.println(mList);
         assertEquals(mList, Arrays.asList("1A", "2A", "2B", "2C", "2D", "3D", "4D", "5D"));
     }
 
-    //TODO
+    //TODO-未完成-join
     /**
-     *  combine items emitted by two Observables whenever an item from one Observable is emitted
-     *  during a time window defined according to an item emitted by the other Observable
+     * combine items emitted by two Observables whenever an item from one Observable is emitted
+     * during a time window defined according to an item emitted by the other Observable
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/join.html">ReactiveX operators documentation: Join</a>
      */
+    @Test
     public void join() {
 
+        Observable<Integer> o1 = Observable.create(new Observable.OnSubscribe<Integer>() {
+            @Override
+            public void call(Subscriber<? super Integer> subscriber) {
+                System.out.println("observable1-->" + Thread.currentThread().getName());
+                subscriber.onNext(1);
+                Utils.sleep(500);
+                subscriber.onNext(2);
+                Utils.sleep(100);
+                subscriber.onNext(3);
+                Utils.sleep(500);
+                subscriber.onNext(4);
+                Utils.sleep(500);
+                subscriber.onCompleted();
+            }
+        })
+                .subscribeOn(mTestScheduler)
+                .doOnNext(System.out::println);
+
+        Observable<String> o2 = Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+                System.out.println("observable2-->" + Thread.currentThread().getName());
+                Utils.sleep(250);
+                subscriber.onNext("A");
+                Utils.sleep(600);
+                subscriber.onNext("B");
+                Utils.sleep(200);
+                subscriber.onNext("C");
+                subscriber.onCompleted();
+            }
+        })
+                .subscribeOn(Schedulers.newThread())
+                .doOnNext(System.out::println);
+
+        o1.join(o2, new Func1<Integer, Observable<Integer>>() {
+            @Override
+            public Observable<Integer> call(Integer num) {
+                return Observable.create(new Observable.OnSubscribe<Integer>() {
+                    @Override
+                    public void call(Subscriber<? super Integer> subscriber) {
+                        subscriber.onNext(num);
+                        Utils.sleep(300);
+                        subscriber.onCompleted();
+                    }
+                }).subscribeOn(mTestScheduler);
+            }
+        }, new Func1<String, Observable<String>>() {
+            @Override
+            public Observable<String> call(String s) {
+                return Observable.create(new Observable.OnSubscribe<String>() {
+                    @Override
+                    public void call(Subscriber<? super String> subscriber) {
+                        subscriber.onNext(s);
+                        Utils.sleep(300);
+                        subscriber.onCompleted();
+                    }
+                }).subscribeOn(mTestScheduler);
+            }
+        }, new Func2<Integer, String, Object>() {
+            @Override
+            public Object call(Integer integer, String s) {
+                return integer + s;
+            }
+        }).subscribe(mList::add);
+
+        mTestScheduler.advanceTimeBy(10,TimeUnit.SECONDS);
+
+        System.out.println(mList);
     }
 
     /**
      * combine multiple Observables into one by merging their emissions
      *
      * @see <a href = "http://rxmarbles.com/#merge">RxMarbles combineLatest merge</a>
+     * @see <a href="http://reactivex.io/documentation/operators/merge.html">ReactiveX operators
+     * documentation: Merge</a>
      */
     @Test
     public void merge() {
@@ -163,6 +238,7 @@ public class CombiningOperatorsTest {
      * emit a specified sequence of items before beginning to emit the items from the source Observable
      *
      * @see <a href="http://rxmarbles.com/#startWith">Rxmarbles diagrams startWith</a>
+     * @see <a href="http://reactivex.io/documentation/operators/startwith.html">ReactiveX operators documentation: StartWith</a>
      */
     @Test
     public void startWith() {
@@ -171,14 +247,68 @@ public class CombiningOperatorsTest {
                 .subscribe(System.out::println);
     }
 
-    //TODO
+    /**
+     * convert an Observable that emits Observables into a single Observable that emits the items
+     * emitted by the most-recently-emitted of those Observables
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/switch.html">ReactiveX operators documentation: Switch</a>
+     */
     @Test
-    public void switchOperator() {
+    public void switchOnNext() {
+        Observable<Integer> o1 = Observable.just(1, 2, 3);
+        Observable<String> o2 = Observable.just("A", "B", "C");
+
+        Observable.switchOnNext(Observable.just(o1, o2))
+                .subscribe(mList::add);
+        System.out.println(mList);
+        assertEquals(mList, Arrays.asList(1, 2, 3, "A", "B", "C"));
 
     }
 
     /**
-     * @see <a href="http://rxmarbles.com/#withLatestFrom">Rxmarbles diagrams startWith</a>
+     * convert an Observable that emits Observables into a single Observable that emits the items
+     * emitted by the most-recently-emitted of those Observables
+     * <p>
+     * 此例根据官方宝蓝图实现
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/images/switch.c.png">switch.png</a>
+     */
+    @Test
+    public void switchOnNext2() {
+
+        Observable<Long> o1 = Observable.interval(0, 1, TimeUnit.SECONDS)
+                .take(3)
+                .map(num -> num + 1)
+                .doOnNext(System.out::println);
+
+        Observable<String> o2 = Observable.interval(0, 1, TimeUnit.SECONDS)
+                .take(3)
+                .map(num -> String.valueOf((char) ('A' + num)))
+                .doOnNext(System.out::println);
+
+        Observable<? extends Observable<? extends Object>> observable =
+                Observable.create(new Observable.OnSubscribe<Observable<? extends Object>>() {
+                    @Override
+                    public void call(Subscriber<? super Observable<? extends Object>> subscriber) {
+                        subscriber.onNext(o1);
+                        Utils.sleep(1500);
+                        subscriber.onNext(o2);
+                        Utils.sleep(3000);
+                        subscriber.onCompleted();
+                    }
+                });
+
+        Observable.switchOnNext(observable)
+                .subscribe(mList::add);
+
+        System.out.println(mList);
+        assertEquals(mList, Arrays.asList(1L, 2L, "A", "B", "C"));
+
+    }
+
+    /**
+     * @see <a href="http://rxmarbles.com/#withLatestFrom">Rxmarbles diagrams withLatestFrom</a>
+     * @see <a href="http://reactivex.io/documentation/operators/combinelatest.html">ReactiveX operators documentation: CombineLatest</a>
      */
     @Test
     public void withLatestFrom() {
@@ -228,6 +358,7 @@ public class CombiningOperatorsTest {
      * single items for each combination based on the results of this function
      *
      * @see <a href="http://rxmarbles.com/#zip">Rxmarbles diagrams zip</a>
+     * @see <a href="http://reactivex.io/documentation/operators/zip.html">ReactiveX operators documentation: Zip</a>
      */
     @Test
     public void zip() {
