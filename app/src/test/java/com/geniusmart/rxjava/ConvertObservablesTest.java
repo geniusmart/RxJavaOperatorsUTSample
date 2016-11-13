@@ -198,6 +198,8 @@ public class ConvertObservablesTest {
     /**
      * Converts the source Observable<T> into an Observable<Observable<T>> that emits the
      * source Observable as its single emission.
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/to.html">ReactiveX operators documentation: To</a>
      */
     @Test
     public void nest() {
