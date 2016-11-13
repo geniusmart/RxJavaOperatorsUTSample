@@ -1,5 +1,7 @@
 package com.geniusmart.rxjava;
 
+import com.geniusmart.rxjava.utils.Utils;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,6 +15,7 @@ import rx.Subscriber;
 import rx.Subscription;
 import rx.functions.Action1;
 import rx.schedulers.TestScheduler;
+import rx.schedulers.TimeInterval;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
@@ -262,9 +265,38 @@ public class UtilityOperatorsTest {
 
     }
 
+    /**
+     * convert an Observable that emits items into one that emits indications of the amount of
+     * time elapsed between those emissions
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/timeinterval.html">ReactiveX
+     * operators documentation: TimeInterval</a>
+     */
     @Test
     public void timeInterval() {
-
+        Observable.create(new Observable.OnSubscribe<Integer>() {
+            @Override
+            public void call(Subscriber<? super Integer> subscriber) {
+                Utils.sleep(500);
+                subscriber.onNext(1);
+                Utils.sleep(1000);
+                subscriber.onNext(2);
+                Utils.sleep(2000);
+                subscriber.onNext(3);
+                Utils.sleep(3000);
+                subscriber.onCompleted();
+            }
+        })
+                .subscribeOn(mTestScheduler)
+                .take(5)
+                .timeInterval()
+                .subscribe(new Action1<TimeInterval<Integer>>() {
+                    @Override
+                    public void call(TimeInterval<Integer> timeInterval) {
+                        System.out.println(timeInterval);
+                    }
+                });
+        mTestScheduler.advanceTimeBy(1,TimeUnit.SECONDS);
     }
 
     @Test
