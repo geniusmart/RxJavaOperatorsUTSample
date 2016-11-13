@@ -16,6 +16,7 @@ import static junit.framework.Assert.assertEquals;
 
 /**
  * Created by geniusmart on 16/11/2.
+ * <p>
  * Operators that originate new Observables.
  */
 public class ConditionalAndBooleanOperatorsTest {

@@ -16,6 +16,7 @@ import static junit.framework.Assert.assertTrue;
 
 /**
  * Created by geniusmart on 16/11/6.
+ * <p>
  * A toolbox of useful Operators for working with Observables
  */
 public class UtilityOperatorsTest {

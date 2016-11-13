@@ -24,7 +24,7 @@ import static junit.framework.Assert.assertEquals;
 
 /**
  * Created by geniusmart on 16/11/6.
- * <p/>
+ * <p>
  * convert an Observable into another object or data structure
  *
  * @see <a href="http://reactivex.io/documentation/operators/to.html">ReactiveX documentation: To</a>

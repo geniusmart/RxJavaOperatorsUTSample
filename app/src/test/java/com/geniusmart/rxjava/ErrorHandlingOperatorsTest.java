@@ -19,6 +19,7 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Created by geniusmart on 16/11/6.
+ * <p>
  * Operators that help to recover from error notifications from an Observable
  */
 public class ErrorHandlingOperatorsTest {

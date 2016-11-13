@@ -22,6 +22,7 @@ import static junit.framework.Assert.assertTrue;
 
 /**
  * Created by geniusmart on 16/11/6.
+ * <p>
  * Specialty Observables that have more precisely-controlled subscription dynamics
  */
 public class ConnectableOperatorsTest {

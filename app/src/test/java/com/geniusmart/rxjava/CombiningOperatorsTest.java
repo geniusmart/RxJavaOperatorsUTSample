@@ -24,6 +24,7 @@ import static junit.framework.Assert.assertEquals;
 
 /**
  * Created by geniusmart on 2016/11/1.
+ * <p>
  * Operators that work with multiple source Observables to create a single Observable
  */
 public class CombiningOperatorsTest {

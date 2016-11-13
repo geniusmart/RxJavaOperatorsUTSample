@@ -13,6 +13,7 @@ import rx.schedulers.TestScheduler;
 
 /**
  * Created by geniusmart on 16/11/2.
+ * <p>
  * Operators that operate on the entire sequence of items emitted by an Observable
  */
 public class MathematicalAndAggregateOperatorsTest {

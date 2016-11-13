@@ -20,6 +20,7 @@ import static junit.framework.Assert.assertEquals;
 
 /**
  * Created by geniusmart on 2016/11/2.
+ * <p>
  * Operators that selectively emit items from a source Observable.
  */
 public class FilteringOperatorsTest {
