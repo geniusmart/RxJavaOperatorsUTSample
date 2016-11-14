@@ -56,7 +56,6 @@ public class ConnectableOperatorsTest {
     }
 
     /**
-     * TODO-autoConnect的作用？
      * instruct a connectable Observable to begin emitting items to its subscribers
      * <p/>
      * 此例子根据connect的官方宝蓝图进行实现

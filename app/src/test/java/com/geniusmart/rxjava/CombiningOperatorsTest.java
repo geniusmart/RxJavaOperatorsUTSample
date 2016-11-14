@@ -21,8 +21,6 @@ import rx.schedulers.TestScheduler;
 
 import static junit.framework.Assert.assertEquals;
 
-//TODO code style
-
 /**
  * Created by geniusmart on 2016/11/1.
  * <p>

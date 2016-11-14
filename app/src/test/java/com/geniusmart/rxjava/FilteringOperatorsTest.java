@@ -13,7 +13,6 @@ import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Subscriber;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.schedulers.TestScheduler;
 
@@ -42,6 +41,8 @@ public class FilteringOperatorsTest {
      * Observable每产生一个结果后，如果在规定的间隔时间内没有别的结果产生，则把这个结果提交给订阅者处理，否则忽略该结果。
      *
      * @see <a href="http://rxmarbles.com/#debounce">RxMarbles diagrams debounce</a>
+     * @see <a href="http://reactivex.io/documentation/operators/debounce.html">ReactiveX operators
+     * documentation: Debounce</a>
      */
     @Test
     public void debounce() {
@@ -75,25 +76,36 @@ public class FilteringOperatorsTest {
         assertEquals(mList, Arrays.asList(1, 5, 6));
     }
 
-    //TODO-如何理解
+    //TODO debounceWithSelector可作为范例
+
+    /**
+     * If the source Observable emits another item before this newly-generated Observable
+     * terminates, debounce will suppress the item.
+     * <p/>
+     * 根据官方宝蓝图实现
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/images/debounce.f.png">debounce.png</a>
+     */
     @Test
     public void debounceWithSelector() {
         Observable.create(new Observable.OnSubscribe<Integer>() {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
-                //产生结果的间隔时间分别为100、200、300...900毫秒
-                for (int i = 1; i < 10; i++) {
-                    subscriber.onNext(i);
-                    Utils.sleep(i * 100);
-                }
+                subscriber.onNext(1);
+                Utils.sleep(2000);
+                //2所对应的timer Observable还未结束，3已经开始发送，因此2将被废弃
+                subscriber.onNext(2);
+                subscriber.onNext(3);
                 subscriber.onCompleted();
             }
-        }).debounce(new Func1<Integer, Observable<Long>>() {
-            @Override
-            public Observable<Long> call(Integer integer) {
-                return Observable.timer(integer * 10, TimeUnit.SECONDS);
-            }
-        });
+        })
+                .subscribeOn(mTestScheduler)
+                .debounce(integer -> Observable.timer(1, TimeUnit.SECONDS))
+                .subscribe(mList::add);
+
+        mTestScheduler.advanceTimeBy(10, TimeUnit.MILLISECONDS);
+        System.out.println(mList);
+        assertEquals(mList, Arrays.asList(1, 3));
     }
 
     /**
@@ -256,8 +268,6 @@ public class FilteringOperatorsTest {
         assertEquals(mList, Collections.singletonList(4));
     }
 
-    //TODO 与结果不一样？？？
-
     /**
      * emit the most recent item emitted by an Observable within periodic time intervals
      *
@@ -287,7 +297,8 @@ public class FilteringOperatorsTest {
             }
         })
                 .subscribeOn(mTestScheduler)
-                .doOnNext(System.out::println);
+                .doOnNext(System.out::println)
+                .doOnCompleted(() -> System.out.println("observable1-Completed"));
 
         Observable<String> observable2 = Observable.create(new Observable.OnSubscribe<String>() {
             @Override
@@ -300,18 +311,91 @@ public class FilteringOperatorsTest {
                 subscriber.onNext("C");
                 Utils.sleep(1000);
                 subscriber.onNext("D");
+                Utils.sleep(500);
                 subscriber.onCompleted();
             }
         })
                 .subscribeOn(Schedulers.newThread())
-                .doOnNext(System.out::println);
+                .doOnNext(System.out::println)
+                .doOnCompleted(() -> System.out.println("observable2-Completed"));
 
 
         observable1.sample(observable2)
                 .subscribe(mList::add);
 
-        mTestScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
+        mTestScheduler.advanceTimeBy(10, TimeUnit.MILLISECONDS);
         System.out.println(mList);
+
+        assertEquals(mList, Arrays.asList(1, 2, 4, 5));
+    }
+
+    /**
+     * Returns an Observable that emits only the first item emitted by the source Observable during
+     * sequential time windows of a specified duration.
+     * <p/>
+     * 根据官方宝蓝图实现
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/images/throttleFirst.png">throttleFirst.png</a>
+     */
+    @Test
+    public void throttleFirst() {
+        Observable.create(new Observable.OnSubscribe<Integer>() {
+            @Override
+            public void call(Subscriber<? super Integer> subscriber) {
+                subscriber.onNext(1);
+                Utils.sleep(500);
+                subscriber.onNext(2);
+                subscriber.onNext(3);
+                Utils.sleep(500);
+                subscriber.onNext(4);
+                subscriber.onNext(5);
+                Utils.sleep(500);
+                subscriber.onNext(6);
+                subscriber.onCompleted();
+            }
+        })
+                .subscribeOn(mTestScheduler)
+                .doOnCompleted(() -> System.out.println("observable1-Completed"))
+                .throttleFirst(500, TimeUnit.MILLISECONDS)
+                .subscribe(mList::add);
+
+        mTestScheduler.advanceTimeBy(10, TimeUnit.MILLISECONDS);
+        System.out.println(mList);
+        assertEquals(mList, Arrays.asList(1, 2, 4, 6));
+    }
+
+    /**
+     * Returns an Observable that emits only the last item emitted by the source Observable during
+     * sequential
+     * time windows of a specified duration.
+     * <p/>
+     * 根据throttleFirst的官方宝蓝图实现
+     */
+    @Test
+    public void throttleLast() {
+        Observable.create(new Observable.OnSubscribe<Integer>() {
+            @Override
+            public void call(Subscriber<? super Integer> subscriber) {
+                subscriber.onNext(1);
+                Utils.sleep(500);
+                subscriber.onNext(2);
+                subscriber.onNext(3);
+                Utils.sleep(500);
+                subscriber.onNext(4);
+                subscriber.onNext(5);
+                Utils.sleep(500);
+                subscriber.onNext(6);
+                subscriber.onCompleted();
+            }
+        })
+                .subscribeOn(mTestScheduler)
+                .doOnCompleted(() -> System.out.println("observable1-Completed"))
+                .throttleLast(500, TimeUnit.MILLISECONDS)
+                .subscribe(System.out::println);
+
+        mTestScheduler.advanceTimeBy(10, TimeUnit.MILLISECONDS);
+        System.out.println(mList);
+        assertEquals(mList, Arrays.asList(1, 3, 5, 6));
     }
 
 }

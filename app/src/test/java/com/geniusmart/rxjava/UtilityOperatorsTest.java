@@ -16,6 +16,7 @@ import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func0;
 import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 import rx.schedulers.TestScheduler;
 
 import static junit.framework.Assert.assertEquals;
@@ -256,6 +257,7 @@ public class UtilityOperatorsTest {
 
     }
 
+    boolean isCompeleted = true;
     /**
      * TODO-serialize
      * force an Observable to make serialized calls and to be well-behaved
@@ -266,6 +268,30 @@ public class UtilityOperatorsTest {
     @Test
     public void serialize() {
 
+        Observable<Integer> integerObservable = Observable.create(new Observable.OnSubscribe<Integer>() {
+            @Override
+            public void call(Subscriber<? super Integer> subscriber) {
+                subscriber.onNext(1);
+                subscriber.onNext(2);
+                if (isCompeleted){
+                    System.out.println(12345);
+                    subscriber.onCompleted();
+                }else {
+                    subscriber.onNext(3);
+                }
+                subscriber.onCompleted();
+
+            }
+        });
+
+        integerObservable
+                .subscribeOn(Schedulers.newThread())
+                .serialize()
+                .subscribe(System.out::println);
+
+        Utils.sleep(1000);
+        isCompeleted = false;
+        integerObservable.serialize().subscribe(System.out::println);
     }
 
     @Test

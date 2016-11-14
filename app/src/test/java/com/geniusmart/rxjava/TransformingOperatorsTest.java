@@ -12,7 +12,9 @@ import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Subscriber;
+import rx.functions.Func0;
 import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 import rx.schedulers.TestScheduler;
 
 import static junit.framework.Assert.assertEquals;
@@ -77,7 +79,7 @@ public class TransformingOperatorsTest {
         assertEquals(mList, expectedList);
     }
 
-    //TODO-bufferClosingSelector
+    //TODO-bufferClosingSelector(是否准确待定)
     @Test
     public void bufferClosingSelector() {
 
@@ -85,42 +87,40 @@ public class TransformingOperatorsTest {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
                 subscriber.onNext(1);
-                Utils.sleep(1000);
                 subscriber.onNext(2);
                 subscriber.onNext(3);
-                Utils.sleep(3);
+                Utils.sleep(2000);
                 subscriber.onNext(4);
                 subscriber.onNext(5);
                 subscriber.onNext(6);
-                subscriber.onCompleted();
+                Utils.sleep(500);
             }
         })
-                .doOnNext(System.out::println);
+                .subscribeOn(mTestScheduler)
+                .doOnNext(System.out::println)
+                .doOnCompleted(()->System.out.println("slkdfsd"));
 
-
-        Observable bufferOpenings = Observable.create(new Observable.OnSubscribe<String>() {
+        Observable bufferClosingSelector = Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
-                Utils.sleep(500);
-                subscriber.onNext("open");
                 Utils.sleep(1000);
                 subscriber.onNext("close");
-                Utils.sleep(1000);
-                subscriber.onNext("open");
-                Utils.sleep(2000);
+                Utils.sleep(1500);
                 subscriber.onNext("close");
                 subscriber.onCompleted();
 
             }
         })
+                .subscribeOn(Schedulers.newThread())
                 .doOnNext(System.out::println);
 
-        observable.buffer(bufferOpenings, new Func1() {
-            @Override
-            public Object call(Object o) {
-                return o;
-            }
-        }).subscribe(System.out::println);
+        observable.buffer((Func0<Observable<?>>) () -> bufferClosingSelector)
+                .subscribe(mList::add);
+
+        mTestScheduler.advanceTimeBy(100, TimeUnit.MILLISECONDS);
+
+        System.out.println(mList);
+
     }
 
     //TODO flatMap和concatmap可作为范例，实现宝蓝图的范例
