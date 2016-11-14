@@ -60,6 +60,7 @@ public class ConnectableOperatorsTest {
      * instruct a connectable Observable to begin emitting items to its subscribers
      * <p/>
      * 此例子根据connect的官方宝蓝图进行实现
+     *
      * @see <a href="http://reactivex.io/documentation/operators/images/publishConnect.png">connect</a>
      */
     @Test
@@ -123,7 +124,8 @@ public class ConnectableOperatorsTest {
      * <p/>
      * 此例子根据connect的官方宝蓝图进行实现
      *
-     * @see <a href="http://reactivex.io/documentation/operators/images/publishRefCount.c.png">ReactiveX operators: RefCount</a>
+     * @see <a href="http://reactivex.io/documentation/operators/images/publishRefCount.c.png">ReactiveX
+     * operators: RefCount</a>
      */
     @Test
     public void refCount() {
@@ -142,11 +144,13 @@ public class ConnectableOperatorsTest {
     }
 
     /**
-     * ensure that all observers see the same sequence of emitted items, even if they subscribe after the Observable has begun emitting items
+     * ensure that all observers see the same sequence of emitted items, even if they subscribe
+     * after the Observable has begun emitting items
      * <p>
      * 此例子根据replay的官方宝蓝图进行实现
      *
-     * @see <a href="http://reactivex.io/documentation/operators/images/replay.png">ReactiveX operators: replay</a>
+     * @see <a href="http://reactivex.io/documentation/operators/images/replay.png">ReactiveX
+     * operators: replay</a>
      */
     @Test
     public void replay() {

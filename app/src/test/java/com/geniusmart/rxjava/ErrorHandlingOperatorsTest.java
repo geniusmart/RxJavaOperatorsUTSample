@@ -34,7 +34,8 @@ public class ErrorHandlingOperatorsTest {
     }
 
     /**
-     * instructs an Observable to emit a particular item when it encounters an error, and then terminate normally
+     * instructs an Observable to emit a particular item when it encounters an error, and then
+     * terminate normally
      */
     @Test
     public void onErrorReturn() {
@@ -52,7 +53,8 @@ public class ErrorHandlingOperatorsTest {
     }
 
     /**
-     * instructs an Observable to begin emitting a second Observable sequence if it encounters an error
+     * instructs an Observable to begin emitting a second Observable sequence if it encounters an
+     * error
      */
     @Test
     public void onErrorResumeNext() {
@@ -74,7 +76,8 @@ public class ErrorHandlingOperatorsTest {
     }
 
     /**
-     * instructs an Observable to begin emitting a second Observable sequence if it encounters an error
+     * instructs an Observable to begin emitting a second Observable sequence if it encounters an
+     * error
      */
     @Test
     public void onErrorResumeNext2() {
@@ -92,7 +95,8 @@ public class ErrorHandlingOperatorsTest {
     }
 
     /**
-     * instructs an Observable to continue emitting items after it encounters an exception (but not another variety of throwable)
+     * instructs an Observable to continue emitting items after it encounters an exception (but not
+     * another variety of throwable)
      */
     @Test
     public void onExceptionResumeNext() {

@@ -70,7 +70,9 @@ public class TransformingOperatorsTest {
         mTestScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
         System.out.println(mList);
 
-        List<List<Long>> expectedList = Arrays.asList(Arrays.asList(0L, 1L), Arrays.asList(2L, 3L),
+        List<List<Long>> expectedList = Arrays.asList(
+                Arrays.asList(0L, 1L),
+                Arrays.asList(2L, 3L),
                 Arrays.asList(4L, 5L));
         assertEquals(mList, expectedList);
     }

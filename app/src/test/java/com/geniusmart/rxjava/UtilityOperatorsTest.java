@@ -43,7 +43,8 @@ public class UtilityOperatorsTest {
      * 此例子根据RxMarbles进行实现
      *
      * @see <a href="http://rxmarbles.com/#delay">delay diagrams
-     * @see <a href="http://reactivex.io/documentation/operators/delay.html">ReactiveX operators documentation: Delay</a>
+     * @see <a href="http://reactivex.io/documentation/operators/delay.html">ReactiveX operators
+     * documentation: Delay</a>
      */
     @Test
     public void delay() {
@@ -79,9 +80,12 @@ public class UtilityOperatorsTest {
     }
 
     /**
-     * Returns an Observable that delays the subscription to the source Observable by a given amount of time.
+     * Returns an Observable that delays the subscription to the source Observable by a given
+     * amount
+     * of time.
      *
-     * @see <a href="http://reactivex.io/documentation/operators/delay.html">ReactiveX operators documentation: Delay</a>
+     * @see <a href="http://reactivex.io/documentation/operators/delay.html">ReactiveX operators
+     * documentation: Delay</a>
      */
     @Test
     public void delaySubscription() {
@@ -210,9 +214,12 @@ public class UtilityOperatorsTest {
     }
 
     /**
-     * represent both the items emitted and the notifications sent as emitted items, or reverse this process
+     * represent both the items emitted and the notifications sent as emitted items, or reverse
+     * this
+     * process
      *
-     * @see <a href="http://reactivex.io/documentation/operators/materialize-dematerialize.html">ReactiveX operators documentation: Materialize</a>
+     * @see <a href="http://reactivex.io/documentation/operators/materialize-dematerialize.html">ReactiveX
+     * operators documentation: Materialize</a>
      */
     @Test
     public void materialize() {
@@ -226,9 +233,12 @@ public class UtilityOperatorsTest {
     }
 
     /**
-     * represent both the items emitted and the notifications sent as emitted items, or reverse this process
+     * represent both the items emitted and the notifications sent as emitted items, or reverse
+     * this
+     * process
      *
-     * @see <a href="http://reactivex.io/documentation/operators/materialize-dematerialize.html">ReactiveX operators documentation: Materialize</a>
+     * @see <a href="http://reactivex.io/documentation/operators/materialize-dematerialize.html">ReactiveX
+     * operators documentation: Materialize</a>
      */
     @Test
     public void dematerialize() {
@@ -250,7 +260,8 @@ public class UtilityOperatorsTest {
      * TODO-serialize
      * force an Observable to make serialized calls and to be well-behaved
      *
-     * @see <a href="http://reactivex.io/documentation/operators/serialize.html">ReactiveX operators documentation: Serialize</a>
+     * @see <a href="http://reactivex.io/documentation/operators/serialize.html">ReactiveX operators
+     * documentation: Serialize</a>
      */
     @Test
     public void serialize() {
@@ -331,7 +342,8 @@ public class UtilityOperatorsTest {
     /**
      * attach a timestamp to each item emitted by an Observable indicating when it was emitted
      *
-     * @see <a href="http://reactivex.io/documentation/operators/timestamp.html">ReactiveX operators documentation: Timestamp</a>
+     * @see <a href="http://reactivex.io/documentation/operators/timestamp.html">ReactiveX operators
+     * documentation: Timestamp</a>
      */
     @Test
     public void timestamp() {
@@ -356,7 +368,8 @@ public class UtilityOperatorsTest {
      * TODO-USING
      * create a disposable resource that has the same lifespan as the Observable
      *
-     * @see <a href="http://reactivex.io/documentation/operators/using.html">ReactiveX operators documentation: Using</a>
+     * @see <a href="http://reactivex.io/documentation/operators/using.html">ReactiveX operators
+     * documentation: Using</a>
      */
     @Test
     public void using() {

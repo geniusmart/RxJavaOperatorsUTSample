@@ -69,7 +69,7 @@ public class MathematicalAndAggregateOperatorsTest {
 
         mTestScheduler.advanceTimeBy(100, TimeUnit.SECONDS);
 
-        assertEquals(mList, Arrays.asList(1,1,1,2,2));
+        assertEquals(mList, Arrays.asList(1, 1, 1, 2, 2));
     }
 
     /**
@@ -110,7 +110,8 @@ public class MathematicalAndAggregateOperatorsTest {
     }
 
     /**
-     * apply a function to each item emitted by an Observable, sequentially, and emit the final value
+     * apply a function to each item emitted by an Observable, sequentially, and emit the final
+     * value
      *
      * @see <a href="http://rxmarbles.com/#reduce">RxMarbles diagrams reduce</a>
      */

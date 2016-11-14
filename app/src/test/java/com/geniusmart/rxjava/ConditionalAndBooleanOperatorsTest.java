@@ -89,7 +89,6 @@ public class ConditionalAndBooleanOperatorsTest {
         mTestScheduler.advanceTimeBy(1200, TimeUnit.SECONDS);
 
         assertEquals(mList, Collections.singletonList(true));
-
     }
 
     /**
@@ -210,7 +209,6 @@ public class ConditionalAndBooleanOperatorsTest {
 
         mTestScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
         assertEquals(mList, Arrays.asList(1L, 2L, 3L, 4L, 5L));
-
     }
 
     /**

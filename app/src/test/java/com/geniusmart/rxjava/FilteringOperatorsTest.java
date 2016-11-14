@@ -110,7 +110,8 @@ public class FilteringOperatorsTest {
     }
 
     /**
-     * @see <a href="http://rxmarbles.com/#distinctUntilChanged">RxMarbles diagrams distinctUntilChanged</a>
+     * @see <a href="http://rxmarbles.com/#distinctUntilChanged">RxMarbles diagrams
+     * distinctUntilChanged</a>
      */
     @Test
     public void distinctUtilChange() {
@@ -261,8 +262,10 @@ public class FilteringOperatorsTest {
      * emit the most recent item emitted by an Observable within periodic time intervals
      *
      * @see <a href="http://rxmarbles.com/#sample">RxMarbles diagrams sample</a>
-     * @see <a href="http://reactivex.io/documentation/operators/sample.html">ReactiveX operators documentation: Sample</a>
-     * @see <a href="https://github.com/ReactiveX/RxJava/wiki/Backpressure">RxJava wiki: Backpressure</a>
+     * @see <a href="http://reactivex.io/documentation/operators/sample.html">ReactiveX operators
+     * documentation: Sample</a>
+     * @see <a href="https://github.com/ReactiveX/RxJava/wiki/Backpressure">RxJava wiki:
+     * Backpressure</a>
      */
     @Test
     public void sample() {

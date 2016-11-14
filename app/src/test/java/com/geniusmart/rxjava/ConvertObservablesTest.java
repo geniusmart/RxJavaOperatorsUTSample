@@ -27,7 +27,8 @@ import static junit.framework.Assert.assertEquals;
  * <p>
  * convert an Observable into another object or data structure
  *
- * @see <a href="http://reactivex.io/documentation/operators/to.html">ReactiveX documentation: To</a>
+ * @see <a href="http://reactivex.io/documentation/operators/to.html">ReactiveX documentation:
+ * To</a>
  */
 public class ConvertObservablesTest {
 
@@ -92,7 +93,7 @@ public class ConvertObservablesTest {
                 .toFuture();
 
         long aLong = future.get();
-        assertEquals(aLong,0L);
+        assertEquals(aLong, 0L);
     }
 
     /**
@@ -140,7 +141,8 @@ public class ConvertObservablesTest {
     }
 
     /**
-     * Returns an Observable that emits a single HashMap containing all items emitted by the source Observable,
+     * Returns an Observable that emits a single HashMap containing all items emitted by the source
+     * Observable,
      * mapped by the keys returned by a specified function
      *
      * @see <a href="http://reactivex.io/documentation/operators/images/toMap.png">toMap</a>
@@ -158,7 +160,8 @@ public class ConvertObservablesTest {
     }
 
     /**
-     * Returns an Observable that emits a single HashMap containing all items emitted by the source Observable,
+     * Returns an Observable that emits a single HashMap containing all items emitted by the source
+     * Observable,
      * mapped by the keys returned by a specified function
      *
      * @see <a href="http://reactivex.io/documentation/operators/images/toMultiMap.png">toMap</a>
@@ -166,7 +169,7 @@ public class ConvertObservablesTest {
     @Test
     public void toMultiMap() {
 
-        Observable.just(Arrays.asList(1,2),Arrays.asList("A","B"))
+        Observable.just(Arrays.asList(1, 2), Arrays.asList("A", "B"))
                 .toMultimap(new Func1<List<? extends Serializable>, Object>() {
                     @Override
                     public Object call(List<? extends Serializable> list) {
@@ -199,7 +202,8 @@ public class ConvertObservablesTest {
      * Converts the source Observable<T> into an Observable<Observable<T>> that emits the
      * source Observable as its single emission.
      *
-     * @see <a href="http://reactivex.io/documentation/operators/to.html">ReactiveX operators documentation: To</a>
+     * @see <a href="http://reactivex.io/documentation/operators/to.html">ReactiveX operators
+     * documentation: To</a>
      */
     @Test
     public void nest() {

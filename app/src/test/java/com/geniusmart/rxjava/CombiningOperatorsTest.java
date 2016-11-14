@@ -57,14 +57,11 @@ public class CombiningOperatorsTest {
                 .map(aLong -> (char) ('A' + aLong))
                 .doOnNext(System.out::println);
 
-
         Plan0<String> then = JoinObservable.from(observable1)
                 .and(observable2)
                 .then((aLong, aChar) -> aLong + String.valueOf(aChar));
 
-        JoinObservable.when(then)
-                .toObservable()
-                .subscribe(mList::add);
+        JoinObservable.when(then).toObservable().subscribe(mList::add);
 
         mTestScheduler.advanceTimeBy(50, TimeUnit.SECONDS);
         assertEquals(mList, Arrays.asList("1A", "2B", "3C", "4D"));
@@ -96,9 +93,7 @@ public class CombiningOperatorsTest {
                 subscriber.onNext(5);
                 subscriber.onCompleted();
             }
-        })
-                .subscribeOn(mTestScheduler)
-                .doOnNext(System.out::println);
+        }).subscribeOn(mTestScheduler).doOnNext(System.out::println);
 
         Observable<String> observable2 = Observable.create(new Observable.OnSubscribe<String>() {
             @Override
@@ -114,13 +109,10 @@ public class CombiningOperatorsTest {
                 subscriber.onNext("D");
                 subscriber.onCompleted();
             }
-        })
-                .subscribeOn(Schedulers.newThread())
-                .doOnNext(System.out::println);
+        }).subscribeOn(Schedulers.newThread()).doOnNext(System.out::println);
 
         Observable.combineLatest(observable1, observable2,
-                (Func2<Integer, String, Object>) (integer, s) -> integer + s)
-                .subscribe(mList::add);
+                (Func2<Integer, String, Object>) (integer, s) -> integer + s).subscribe(mList::add);
 
         //测试线程提前一定时间，让observable能顺利开始发送数据 TODO,不会阻塞线程--？？
         mTestScheduler.advanceTimeBy(1, TimeUnit.MILLISECONDS);
@@ -129,11 +121,13 @@ public class CombiningOperatorsTest {
     }
 
     //TODO-未完成-join
+
     /**
      * combine items emitted by two Observables whenever an item from one Observable is emitted
      * during a time window defined according to an item emitted by the other Observable
      *
-     * @see <a href="http://reactivex.io/documentation/operators/join.html">ReactiveX operators documentation: Join</a>
+     * @see <a href="http://reactivex.io/documentation/operators/join.html">ReactiveX operators
+     * documentation: Join</a>
      */
     @Test
     public void join() {
@@ -152,9 +146,7 @@ public class CombiningOperatorsTest {
                 Utils.sleep(500);
                 subscriber.onCompleted();
             }
-        })
-                .subscribeOn(mTestScheduler)
-                .doOnNext(System.out::println);
+        }).subscribeOn(mTestScheduler).doOnNext(System.out::println);
 
         Observable<String> o2 = Observable.create(new Observable.OnSubscribe<String>() {
             @Override
@@ -168,9 +160,7 @@ public class CombiningOperatorsTest {
                 subscriber.onNext("C");
                 subscriber.onCompleted();
             }
-        })
-                .subscribeOn(Schedulers.newThread())
-                .doOnNext(System.out::println);
+        }).subscribeOn(Schedulers.newThread()).doOnNext(System.out::println);
 
         o1.join(o2, new Func1<Integer, Observable<Integer>>() {
             @Override
@@ -203,7 +193,7 @@ public class CombiningOperatorsTest {
             }
         }).subscribe(mList::add);
 
-        mTestScheduler.advanceTimeBy(10,TimeUnit.SECONDS);
+        mTestScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
 
         System.out.println(mList);
     }
@@ -227,42 +217,40 @@ public class CombiningOperatorsTest {
                 .map(aLong -> 1)
                 .doOnNext(System.out::println);
 
-        Observable.merge(observable1, observable2)
-                .subscribe(mList::add);
+        Observable.merge(observable1, observable2).subscribe(mList::add);
 
         mTestScheduler.advanceTimeBy(1000, TimeUnit.SECONDS);
         assertEquals(mList, Arrays.asList(20L, 40L, 60L, 1L, 80L, 100L, 1L));
     }
 
     /**
-     * emit a specified sequence of items before beginning to emit the items from the source Observable
+     * emit a specified sequence of items before beginning to emit the items from the source
+     * Observable
      *
      * @see <a href="http://rxmarbles.com/#startWith">Rxmarbles diagrams startWith</a>
-     * @see <a href="http://reactivex.io/documentation/operators/startwith.html">ReactiveX operators documentation: StartWith</a>
+     * @see <a href="http://reactivex.io/documentation/operators/startwith.html">ReactiveX operators
+     * documentation: StartWith</a>
      */
     @Test
     public void startWith() {
-        Observable.just(2, 3)
-                .startWith(1)
-                .subscribe(System.out::println);
+        Observable.just(2, 3).startWith(1).subscribe(System.out::println);
     }
 
     /**
      * convert an Observable that emits Observables into a single Observable that emits the items
      * emitted by the most-recently-emitted of those Observables
      *
-     * @see <a href="http://reactivex.io/documentation/operators/switch.html">ReactiveX operators documentation: Switch</a>
+     * @see <a href="http://reactivex.io/documentation/operators/switch.html">ReactiveX operators
+     * documentation: Switch</a>
      */
     @Test
     public void switchOnNext() {
         Observable<Integer> o1 = Observable.just(1, 2, 3);
         Observable<String> o2 = Observable.just("A", "B", "C");
 
-        Observable.switchOnNext(Observable.just(o1, o2))
-                .subscribe(mList::add);
+        Observable.switchOnNext(Observable.just(o1, o2)).subscribe(mList::add);
         System.out.println(mList);
         assertEquals(mList, Arrays.asList(1, 2, 3, "A", "B", "C"));
-
     }
 
     /**
@@ -298,17 +286,16 @@ public class CombiningOperatorsTest {
                     }
                 });
 
-        Observable.switchOnNext(observable)
-                .subscribe(mList::add);
+        Observable.switchOnNext(observable).subscribe(mList::add);
 
         System.out.println(mList);
         assertEquals(mList, Arrays.asList(1L, 2L, "A", "B", "C"));
-
     }
 
     /**
      * @see <a href="http://rxmarbles.com/#withLatestFrom">Rxmarbles diagrams withLatestFrom</a>
-     * @see <a href="http://reactivex.io/documentation/operators/combinelatest.html">ReactiveX operators documentation: CombineLatest</a>
+     * @see <a href="http://reactivex.io/documentation/operators/combinelatest.html">ReactiveX
+     * operators documentation: CombineLatest</a>
      */
     @Test
     public void withLatestFrom() {
@@ -325,9 +312,7 @@ public class CombiningOperatorsTest {
                 Utils.sleep(500);
                 subscriber.onNext(5);
             }
-        })
-                .subscribeOn(mTestScheduler)
-                .doOnNext(System.out::println);
+        }).subscribeOn(mTestScheduler).doOnNext(System.out::println);
 
         Observable<String> observable2 = Observable.create(new Observable.OnSubscribe<String>() {
             @Override
@@ -341,16 +326,12 @@ public class CombiningOperatorsTest {
                 Utils.sleep(100);
                 subscriber.onNext("D");
             }
-        })
-                .subscribeOn(Schedulers.newThread())
-                .doOnNext(System.out::println);
+        }).subscribeOn(Schedulers.newThread()).doOnNext(System.out::println);
 
-        observable1.withLatestFrom(observable2, (integer, s) -> integer + s)
-                .subscribe(mList::add);
+        observable1.withLatestFrom(observable2, (integer, s) -> integer + s).subscribe(mList::add);
 
         mTestScheduler.advanceTimeBy(1, TimeUnit.MILLISECONDS);
         assertEquals(mList, Arrays.asList("2A", "3D", "4D", "5D"));
-
     }
 
     /**
@@ -358,7 +339,8 @@ public class CombiningOperatorsTest {
      * single items for each combination based on the results of this function
      *
      * @see <a href="http://rxmarbles.com/#zip">Rxmarbles diagrams zip</a>
-     * @see <a href="http://reactivex.io/documentation/operators/zip.html">ReactiveX operators documentation: Zip</a>
+     * @see <a href="http://reactivex.io/documentation/operators/zip.html">ReactiveX operators
+     * documentation: Zip</a>
      */
     @Test
     public void zip() {
@@ -371,12 +353,10 @@ public class CombiningOperatorsTest {
                 .map(aLong -> (char) ('A' + aLong))
                 .doOnNext(System.out::println);
 
-
         Observable.zip(observable1, observable2, (aLong, aChar) -> aLong + String.valueOf(aChar))
                 .subscribe(mList::add);
 
         mTestScheduler.advanceTimeBy(50, TimeUnit.SECONDS);
         assertEquals(mList, Arrays.asList("1A", "2B", "3C", "4D"));
     }
-
 }
