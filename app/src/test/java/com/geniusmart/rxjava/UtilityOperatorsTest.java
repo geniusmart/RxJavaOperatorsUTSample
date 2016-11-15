@@ -14,8 +14,6 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.functions.Action1;
-import rx.functions.Func0;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.schedulers.TestScheduler;
 
@@ -271,8 +269,6 @@ public class UtilityOperatorsTest {
                 });
     }
 
-    boolean isCompeleted = true;
-
     /**
      * TODO-serialize
      * force an Observable to make serialized calls and to be well-behaved
@@ -283,30 +279,6 @@ public class UtilityOperatorsTest {
     @Test
     public void serialize() {
 
-        Observable<Integer> integerObservable = Observable.create(new Observable.OnSubscribe<Integer>() {
-            @Override
-            public void call(Subscriber<? super Integer> subscriber) {
-                subscriber.onNext(1);
-                subscriber.onNext(2);
-                if (isCompeleted) {
-                    System.out.println(12345);
-                    subscriber.onCompleted();
-                } else {
-                    subscriber.onNext(3);
-                }
-                subscriber.onCompleted();
-
-            }
-        });
-
-        integerObservable
-                .subscribeOn(Schedulers.newThread())
-                .serialize()
-                .subscribe(System.out::println);
-
-        Utils.sleep(1000);
-        isCompeleted = false;
-        integerObservable.serialize().subscribe(System.out::println);
     }
 
     /**
@@ -463,7 +435,7 @@ public class UtilityOperatorsTest {
     }
 
     /**
-     * TODO-USING
+     * TODO-using
      * create a disposable resource that has the same lifespan as the Observable
      *
      * @see <a href="http://reactivex.io/documentation/operators/using.html">ReactiveX operators
@@ -471,21 +443,6 @@ public class UtilityOperatorsTest {
      */
     @Test
     public void using() {
-        Observable.using(new Func0<Object>() {
-            @Override
-            public Object call() {
-                return null;
-            }
-        }, new Func1<Object, Observable<?>>() {
-            @Override
-            public Observable<?> call(Object o) {
-                return null;
-            }
-        }, new Action1<Object>() {
-            @Override
-            public void call(Object o) {
 
-            }
-        }).subscribe(System.out::println);
     }
 }

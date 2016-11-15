@@ -123,8 +123,6 @@ public class TransformingOperatorsTest {
 
     }
 
-    //TODO flatMap和concatmap可作为范例，实现宝蓝图的范例
-
     /**
      * transform the items emitted by an Observable into Observables, then flatten the
      * emissions from those into a single Observable

@@ -130,8 +130,6 @@ public class ConditionalAndBooleanOperatorsTest {
         assertEquals(mList, Collections.singletonList("geniusmart"));
     }
 
-    //TODO 可以作为范例
-
     /**
      * discard items emitted by an Observable until a second Observable emits an item
      *

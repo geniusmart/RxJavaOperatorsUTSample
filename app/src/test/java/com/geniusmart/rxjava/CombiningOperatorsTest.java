@@ -66,7 +66,6 @@ public class CombiningOperatorsTest {
     }
 
     /**
-     * TODO:时间提前的原理
      * when an item is emitted by either of two Observables, combine the latest
      * item emitted by each Observable via a specified function and emit items
      * based on the results of this function
@@ -112,8 +111,8 @@ public class CombiningOperatorsTest {
         Observable.combineLatest(observable1, observable2,
                 (Func2<Integer, String, Object>) (integer, s) -> integer + s).subscribe(mList::add);
 
-        //测试线程提前一定时间，让observable能顺利开始发送数据 TODO,不会阻塞线程--？？
-        mTestScheduler.advanceTimeBy(1, TimeUnit.MILLISECONDS);
+        //测试线程提前一定时间，让observable能顺利开始发送数据
+        mTestScheduler.advanceTimeBy(10, TimeUnit.MILLISECONDS);
         System.out.println(mList);
         assertEquals(mList, Arrays.asList("1A", "2A", "2B", "2C", "2D", "3D", "4D", "5D"));
     }

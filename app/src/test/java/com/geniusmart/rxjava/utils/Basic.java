@@ -5,6 +5,7 @@ import org.junit.Test;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
+import rx.Subscriber;
 import rx.schedulers.Schedulers;
 import rx.schedulers.TestScheduler;
 
@@ -12,8 +13,6 @@ import rx.schedulers.TestScheduler;
  * Created by geniusmart on 2016/11/10.
  */
 public class Basic {
-
-    //TODO 聚合操作符的线程原理
 
     /**
      * 测试线程早于子线程执行完毕
@@ -109,6 +108,28 @@ public class Basic {
                 });
 
         testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
+    }
+
+    //TODO:聚合操作符使用TestShedule不会阻塞测试线程
+    @Test
+    public void test11(){
+        Observable<Integer> observable = Observable.create(new Observable.OnSubscribe<Integer>() {
+            @Override
+            public void call(Subscriber<? super Integer> subscriber) {
+                System.out.println("observable1-->" + Thread.currentThread().getName());
+                subscriber.onNext(1);
+                Utils.sleep(500);
+                subscriber.onNext(2);
+                Utils.sleep(1500);
+                subscriber.onNext(3);
+                Utils.sleep(250);
+                subscriber.onNext(4);
+                Utils.sleep(500);
+                subscriber.onNext(5);
+                subscriber.onCompleted();
+            }
+        }).doOnNext(System.out::println);
+        observable.subscribe(System.out::println);
     }
 
 }

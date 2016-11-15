@@ -59,8 +59,6 @@ public class ConnectableOperatorsTest {
         assertEquals(mList, Arrays.asList(1, 2, 3));
     }
 
-    //TODO-connect-可作为范例
-
     /**
      * instruct a connectable Observable to begin emitting items to its subscribers
      * <p/>

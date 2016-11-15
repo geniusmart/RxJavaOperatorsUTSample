@@ -76,8 +76,6 @@ public class FilteringOperatorsTest {
         assertEquals(mList, Arrays.asList(1, 5, 6));
     }
 
-    //TODO debounceWithSelector可作为范例
-
     /**
      * If the source Observable emits another item before this newly-generated Observable
      * terminates, debounce will suppress the item.
