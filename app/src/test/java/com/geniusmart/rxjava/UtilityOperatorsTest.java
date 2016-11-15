@@ -82,8 +82,7 @@ public class UtilityOperatorsTest {
 
     /**
      * Returns an Observable that delays the subscription to the source Observable by a given
-     * amount
-     * of time.
+     * amount of time.
      *
      * @see <a href="http://reactivex.io/documentation/operators/delay.html">ReactiveX operators
      * documentation: Delay</a>
@@ -216,8 +215,7 @@ public class UtilityOperatorsTest {
 
     /**
      * represent both the items emitted and the notifications sent as emitted items, or reverse
-     * this
-     * process
+     * this process
      *
      * @see <a href="http://reactivex.io/documentation/operators/materialize-dematerialize.html">ReactiveX
      * operators documentation: Materialize</a>
@@ -235,8 +233,7 @@ public class UtilityOperatorsTest {
 
     /**
      * represent both the items emitted and the notifications sent as emitted items, or reverse
-     * this
-     * process
+     * this process
      *
      * @see <a href="http://reactivex.io/documentation/operators/materialize-dematerialize.html">ReactiveX
      * operators documentation: Materialize</a>
@@ -252,12 +249,30 @@ public class UtilityOperatorsTest {
         assertEquals(mList, Arrays.asList(1, 2));
     }
 
+    /**
+     * specify the scheduler on which an observer will observe this Observable
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/observeon.html">ReactiveX operators
+     * documentation: ObserveOn</a>
+     */
     @Test
     public void observeOn() {
-
+        Observable.create(new Observable.OnSubscribe<Integer>() {
+            @Override
+            public void call(Subscriber<? super Integer> subscriber) {
+                System.out.println("Observable's Thread = " + Thread.currentThread().getName());
+                subscriber.onNext(1);
+                subscriber.onCompleted();
+            }
+        })
+                .observeOn(Schedulers.newThread())
+                .subscribe((num) -> {
+                    System.out.println("Subscriber's Thread = " + Thread.currentThread().getName());
+                });
     }
 
     boolean isCompeleted = true;
+
     /**
      * TODO-serialize
      * force an Observable to make serialized calls and to be well-behaved
@@ -273,10 +288,10 @@ public class UtilityOperatorsTest {
             public void call(Subscriber<? super Integer> subscriber) {
                 subscriber.onNext(1);
                 subscriber.onNext(2);
-                if (isCompeleted){
+                if (isCompeleted) {
                     System.out.println(12345);
                     subscriber.onCompleted();
-                }else {
+                } else {
                     subscriber.onNext(3);
                 }
                 subscriber.onCompleted();
@@ -294,14 +309,71 @@ public class UtilityOperatorsTest {
         integerObservable.serialize().subscribe(System.out::println);
     }
 
+    /**
+     * operate upon the emissions and notifications from an Observable
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/subscribe.html">ReactiveX operators
+     * documentation: Subscribe</a>
+     */
     @Test
     public void subscribe() {
-
+        Observable.just(1, 2, 3)
+                .subscribe(mList::add,
+                        (throwable) -> mList.add("Error"),
+                        () -> mList.add("Complete"));
+        assertEquals(mList, Arrays.asList(1, 2, 3, "Complete"));
     }
 
+    /**
+     * specify the scheduler an Observable should use when it is subscribed to
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/subscribeon.html">ReactiveX
+     * operators documentation: SubscribeOn</a>
+     */
     @Test
     public void subscribeOn() {
+        Observable.create(new Observable.OnSubscribe<Integer>() {
+            @Override
+            public void call(Subscriber<? super Integer> subscriber) {
+                System.out.println("Observable's Thread = " + Thread.currentThread().getName());
+                subscriber.onNext(1);
+                subscriber.onCompleted();
+            }
+        })
+                .subscribeOn(Schedulers.newThread())
+                .subscribe((num) -> {
+                    System.out.println("Subscriber's Thread = " + Thread.currentThread().getName());
+                });
+    }
 
+    /**
+     * 根据官方宝蓝图实现
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/images/schedulers.png">schedulers.png</a>
+     */
+    @Test
+    public void subscribeOn_and_observeOn() {
+        Observable.create(new Observable.OnSubscribe<Integer>() {
+            @Override
+            public void call(Subscriber<? super Integer> subscriber) {
+                System.out.println("Observable's Thread = " + Thread.currentThread().getName());
+                subscriber.onNext(1);
+                subscriber.onCompleted();
+            }
+        })
+                .observeOn(Schedulers.io())//决定了map()的线程
+                .map(num -> {
+                    System.out.println("map's Thread = " + Thread.currentThread().getName());
+                    return num;
+                })
+                .subscribeOn(Schedulers.newThread())//决定了消息源的线程
+                .observeOn(Schedulers.computation())//决定了订阅者的线程
+                .subscribe((num) -> {
+                    System.out.println("Subscriber's Thread = " + Thread.currentThread().getName());
+                });
+
+        //保证所有线程正常执行完毕
+        Utils.sleep(1000);
     }
 
     /**

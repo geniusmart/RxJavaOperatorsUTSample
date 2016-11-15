@@ -36,20 +36,51 @@ public class ErrorHandlingOperatorsTest {
     /**
      * instructs an Observable to emit a particular item when it encounters an error, and then
      * terminate normally
+     * <p>
+     * 根据官方宝蓝图实现
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/catch.html">ReactiveX operators
+     * documentation: Catch</a>
      */
     @Test
     public void onErrorReturn() {
+        Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+                subscriber.onNext("○");
+                subscriber.onNext("○");
+                subscriber.onNext("○");
+                subscriber.onError(new ArithmeticException());
+            }
+        })
+                .onErrorReturn(throwable -> "◇")
+                .subscribe(mList::add);
+        assertEquals(mList, Arrays.asList("○", "○", "○", "◇"));
+    }
+
+    /**
+     * instructs an Observable to begin emitting a second Observable sequence if it encounters an
+     * error
+     * <p>
+     * 根据官方宝蓝图实现
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/catch.html">ReactiveX operators
+     * documentation: Catch</a>
+     */
+    @Test
+    public void onErrorResumeNext() {
         Observable.create(new Observable.OnSubscribe<Integer>() {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
                 subscriber.onNext(1);
                 subscriber.onNext(2);
-                subscriber.onError(new ArithmeticException());
+                subscriber.onNext(3);
+                subscriber.onError(new NullPointerException());
             }
         })
-                .onErrorReturn(throwable -> 3)
+                .onErrorResumeNext(Observable.just(4, 5))
                 .subscribe(mList::add);
-        assertEquals(mList, Arrays.asList(1, 2, 3));
+        assertEquals(mList, Arrays.asList(1, 2, 3, 4, 5));
     }
 
     /**
@@ -57,7 +88,7 @@ public class ErrorHandlingOperatorsTest {
      * error
      */
     @Test
-    public void onErrorResumeNext() {
+    public void onErrorResumeNext2() {
         Observable.create(new Observable.OnSubscribe<Integer>() {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
@@ -76,27 +107,11 @@ public class ErrorHandlingOperatorsTest {
     }
 
     /**
-     * instructs an Observable to begin emitting a second Observable sequence if it encounters an
-     * error
-     */
-    @Test
-    public void onErrorResumeNext2() {
-        Observable.create(new Observable.OnSubscribe<Integer>() {
-            @Override
-            public void call(Subscriber<? super Integer> subscriber) {
-                subscriber.onNext(1);
-                subscriber.onNext(2);
-                subscriber.onError(new NullPointerException());
-            }
-        })
-                .onErrorResumeNext(Observable.just(3))
-                .subscribe(mList::add);
-        assertEquals(mList, Arrays.asList(1, 2, 3));
-    }
-
-    /**
      * instructs an Observable to continue emitting items after it encounters an exception (but not
      * another variety of throwable)
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/catch.html">ReactiveX operators
+     * documentation: Catch</a>
      */
     @Test
     public void onExceptionResumeNext() {
@@ -118,6 +133,12 @@ public class ErrorHandlingOperatorsTest {
         assertEquals(mList, Arrays.asList(1, 2));
     }
 
+    /**
+     * recover from an onError notification by continuing the sequence without error
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/retry.html">ReactiveX operators
+     * documentation: Retry</a>
+     */
     @Test
     public void retry() {
         Observable.create(new Observable.OnSubscribe<Integer>() {
@@ -139,8 +160,11 @@ public class ErrorHandlingOperatorsTest {
     }
 
     /**
-     * 破坏数据流
-     * 有关repeatWhen的参考文章：http://www.jianshu.com/p/023a5f60e6d0
+     * retryWhen破坏数据流的示例
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/retry.html">ReactiveX operators
+     * documentation: Retry</a>
+     * @see <a href="http://www.jianshu.com/p/023a5f60e6d0">retryWhen和repeatWhen</a>
      */
     @Test
     public void retryWhen_break_sequence() {
@@ -162,6 +186,10 @@ public class ErrorHandlingOperatorsTest {
 
     /**
      * 使用retryWhen() + flatMap() + timer() 实现延迟重新订阅
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/retry.html">ReactiveX operators
+     * documentation: Retry</a>
+     * @see <a href="http://www.jianshu.com/p/023a5f60e6d0">retryWhen和repeatWhen</a>
      */
     @Test
     public void retryWhen_flatMap_timer() {
@@ -191,48 +219,11 @@ public class ErrorHandlingOperatorsTest {
     }
 
     /**
-     * TODO：使用zip() + range()实现有限次数的重订阅(与预期结果不一致)
-     */
-    @Test
-    public void retryWhen_zip_range() {
-        Observable.create(new Observable.OnSubscribe<Integer>() {
-            @Override
-            public void call(Subscriber<? super Integer> subscriber) {
-                System.out.println("subscribing");
-                subscriber.onNext(1);
-                subscriber.onNext(2);
-                subscriber.onError(new RuntimeException("always fails"));
-            }
-        })
-                .retryWhen(new Func1<Observable<? extends Throwable>, Observable<?>>() {
-                    @Override
-                    public Observable<?> call(Observable<? extends Throwable> throwable) {
-                        return throwable.zipWith(Observable.range(1, 3), new Func2<Throwable, Integer, Object>() {
-                            @Override
-                            public Object call(Throwable throwable, Integer num) {
-                                System.out.println("--->" + num + "-->" + throwable.getMessage());
-                                return num;
-                            }
-                        }).flatMap(new Func1<Object, Observable<?>>() {
-                            @Override
-                            public Observable<?> call(Object o) {
-                                //TODO 这两者的区别是什么？？
-                                return Observable.just(o);
-                                //return Observable.timer(1,TimeUnit.SECONDS);
-                            }
-                        });
-                    }
-                })
-                .doOnNext(System.out::println)
-                .doOnCompleted(() -> System.out.println("completed"))
-                .toBlocking()
-                .forEach(mList::add);
-
-        assertEquals(mList, Arrays.asList(1, 2, 1, 2, 1, 2, 1, 2));
-    }
-
-    /**
      * 延迟策略与次数限制的重试机制结合起来
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/retry.html">ReactiveX operators
+     * documentation: Retry</a>
+     * @see <a href="http://www.jianshu.com/p/023a5f60e6d0">retryWhen和repeatWhen</a>
      */
     @Test
     public void retryWhen_zip_range_timer() {

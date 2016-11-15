@@ -13,9 +13,11 @@ import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.functions.Func1;
 import rx.observables.ConnectableObservable;
 import rx.schedulers.Schedulers;
+import rx.schedulers.TestScheduler;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
@@ -27,10 +29,12 @@ import static junit.framework.Assert.assertTrue;
  */
 public class ConnectableOperatorsTest {
 
+    private TestScheduler mTestScheduler;
     private List<Object> mList;
 
     @Before
     public void setUp() {
+        mTestScheduler = new TestScheduler();
         mList = new ArrayList<>();
     }
 
@@ -55,12 +59,15 @@ public class ConnectableOperatorsTest {
         assertEquals(mList, Arrays.asList(1, 2, 3));
     }
 
+    //TODO-connect-可作为范例
+
     /**
      * instruct a connectable Observable to begin emitting items to its subscribers
      * <p/>
      * 此例子根据connect的官方宝蓝图进行实现
      *
-     * @see <a href="http://reactivex.io/documentation/operators/images/publishConnect.png">connect</a>
+     * @see <a href="http://reactivex.io/documentation/operators/images/publishConnect.png">connect.png</a>
+     * @see <a href="http://reactivex.io/documentation/operators/connect.html">connect</a>
      */
     @Test
     public void connect() {
@@ -118,13 +125,12 @@ public class ConnectableOperatorsTest {
     }
 
     /**
-     * TODO-refCount未完成
      * make a Connectable Observable behave like an ordinary Observable
      * <p/>
-     * 此例子根据connect的官方宝蓝图进行实现
+     * 此用例介绍refCount的概念，官方宝蓝图的实现详见refCount2()用例
      *
-     * @see <a href="http://reactivex.io/documentation/operators/images/publishRefCount.c.png">ReactiveX
-     * operators: RefCount</a>
+     * @see <a href="http://reactivex.io/documentation/operators/refcount.html">ReactiveX
+     * documentation: RefCount</a>
      */
     @Test
     public void refCount() {
@@ -133,12 +139,88 @@ public class ConnectableOperatorsTest {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
                 subscriber.onNext(1);
-                Utils.sleep(3000);
                 subscriber.onNext(2);
-                Utils.sleep(3000);
                 subscriber.onNext(3);
+                subscriber.onCompleted();
             }
         }).publish();
+
+        Observable<Integer> observable = connectableObservable.refCount();
+
+        observable.subscribe(mList::add);
+
+        assertEquals(mList, Arrays.asList(1, 2, 3));
+
+    }
+
+    /**
+     * make a Connectable Observable behave like an ordinary Observable
+     * <p/>
+     * 此例子根据connect的官方宝蓝图进行实现，refCount将ConnectableObservable转换为普通的Observable，
+     * 但仍然保持了hot数据流的特点，可对比下文的without_public_and_refCount()中cold数据流的区别
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/images/publishRefCount.c.png">RefCount.png</a>
+     * @see <a href="http://reactivex.io/documentation/operators/refcount.html">ReactiveX
+     * documentation: RefCount</a>
+     */
+    @Test
+    public void refCount2() {
+
+        List<Long> list1 = new ArrayList<>();
+        List<Long> list2 = new ArrayList<>();
+
+        //构造0,1,2的数据流，每隔300ms发射数据
+        Observable<Long> observable = Observable.interval(0, 300, TimeUnit.MILLISECONDS)
+                .take(3)
+                .publish()
+                .refCount()
+                .doOnNext(System.out::println)
+                .doOnCompleted(() -> System.out.println("onCompleted"))
+                .subscribeOn(Schedulers.newThread());
+
+        Subscription subscribe1 = observable.subscribe(list1::add);
+        Utils.sleep(100);
+        Subscription subscribe2 = observable.subscribe(list2::add);
+
+        Utils.sleep(400);
+        subscribe1.unsubscribe();
+        subscribe2.unsubscribe();
+
+        Utils.sleep(600);
+
+        assertEquals(list1, Arrays.asList(0L, 1L));
+        assertEquals(list2, Collections.singletonList(1L));
+
+    }
+
+    /**
+     * 此方法与refCount2比对，展示hot与cold数据流的区别
+     */
+    @Test
+    public void without_public_and_refCount() {
+
+        List<Long> list1 = new ArrayList<>();
+        List<Long> list2 = new ArrayList<>();
+
+        //构造1,2,3的数据流，每隔3s发射数据
+        Observable<Long> observable = Observable.interval(0, 300, TimeUnit.MILLISECONDS)
+                .take(3)
+                .doOnNext(System.out::println)
+                .doOnCompleted(() -> System.out.println("onCompleted"))
+                .subscribeOn(Schedulers.newThread());
+
+        Subscription subscribe1 = observable.subscribe(list1::add);
+        Utils.sleep(100);
+        Subscription subscribe2 = observable.subscribe(list2::add);
+
+        Utils.sleep(400);
+        subscribe1.unsubscribe();
+        subscribe2.unsubscribe();
+
+        Utils.sleep(600);
+
+        assertEquals(list1, Arrays.asList(0L, 1L));
+        assertEquals(list2, Arrays.asList(0L, 1L));
 
     }
 
@@ -148,8 +230,9 @@ public class ConnectableOperatorsTest {
      * <p>
      * 此例子根据replay的官方宝蓝图进行实现
      *
-     * @see <a href="http://reactivex.io/documentation/operators/images/replay.png">ReactiveX
-     * operators: replay</a>
+     * @see <a href="http://reactivex.io/documentation/operators/images/replay.png">replay.png</a>
+     * @see <a href="http://reactivex.io/documentation/operators/replay.html">ReactiveX operators
+     * documentation: Replay</a>
      */
     @Test
     public void replay() {
@@ -160,11 +243,13 @@ public class ConnectableOperatorsTest {
         ConnectableObservable<Integer> connectableObservable = Observable.create(new Observable.OnSubscribe<Integer>() {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
+                System.out.println("Observable只执行一次");
                 subscriber.onNext(1);
                 Utils.sleep(3000);
                 subscriber.onNext(2);
                 Utils.sleep(3000);
                 subscriber.onNext(3);
+                subscriber.onCompleted();
             }
         }).replay();
 
@@ -190,5 +275,43 @@ public class ConnectableOperatorsTest {
 
         assertEquals(list1, Arrays.asList(1, 2, 3));
         assertEquals(list2, Arrays.asList(1, 2, 3));
+    }
+
+    /**
+     * remember the sequence of items emitted by the Observable and emit the same sequence to
+     * future Subscribers
+     * <p>
+     * cache操作函数和replay类似，但无需使用ConnectableObservable
+     * <p>
+     * 此例子实现了该宝蓝图：https://raw.githubusercontent.com/wiki/ReactiveX/RxJava/images/rx-operators/cache.png
+     */
+    @Test
+    public void cache() {
+
+        List<Integer> list1 = new ArrayList<>();
+        List<Integer> list2 = new ArrayList<>();
+
+        //构造1,2,3的数据流，每隔3s发射数据
+        Observable<Integer> cacheObservable = Observable.create(new Observable.OnSubscribe<Integer>() {
+            @Override
+            public void call(Subscriber<? super Integer> subscriber) {
+                System.out.println("Observable只执行一次");
+                subscriber.onNext(1);
+                subscriber.onNext(2);
+                subscriber.onNext(3);
+                Utils.sleep(1000);
+                subscriber.onNext(4);
+                subscriber.onCompleted();
+            }
+        }).cache().subscribeOn(Schedulers.newThread());
+
+        cacheObservable.subscribe(list1::add);
+        Utils.sleep(800);
+        cacheObservable.subscribe(list2::add);
+
+        //确保所有线程能执行完毕
+        Utils.sleep(2000);
+        assertEquals(list1, Arrays.asList(1, 2, 3, 4));
+        assertEquals(list2, Arrays.asList(1, 2, 3, 4));
     }
 }
