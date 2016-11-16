@@ -1,6 +1,6 @@
 package com.geniusmart.rxjava;
 
-import com.geniusmart.rxjava.utils.Utils;
+import com.geniusmart.rxjava.utils.OperatorUtils;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -89,11 +89,11 @@ public class TransformingOperatorsTest {
                 subscriber.onNext(1);
                 subscriber.onNext(2);
                 subscriber.onNext(3);
-                Utils.sleep(2000);
+                OperatorUtils.sleep(2000);
                 subscriber.onNext(4);
                 subscriber.onNext(5);
                 subscriber.onNext(6);
-                Utils.sleep(500);
+                OperatorUtils.sleep(500);
             }
         })
                 .subscribeOn(mTestScheduler)
@@ -103,9 +103,9 @@ public class TransformingOperatorsTest {
         Observable bufferClosingSelector = Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
-                Utils.sleep(1000);
+                OperatorUtils.sleep(1000);
                 subscriber.onNext("close");
-                Utils.sleep(1500);
+                OperatorUtils.sleep(1500);
                 subscriber.onNext("close");
                 subscriber.onCompleted();
 
@@ -186,11 +186,11 @@ public class TransformingOperatorsTest {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
                 subscriber.onNext(1);
-                Utils.sleep(1500);
+                OperatorUtils.sleep(1500);
                 subscriber.onNext(2);
-                Utils.sleep(500);
+                OperatorUtils.sleep(500);
                 subscriber.onNext(3);
-                Utils.sleep(1500);
+                OperatorUtils.sleep(1500);
                 subscriber.onCompleted();
             }
         })

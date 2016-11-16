@@ -1,6 +1,6 @@
 package com.geniusmart.rxjava;
 
-import com.geniusmart.rxjava.utils.Utils;
+import com.geniusmart.rxjava.utils.OperatorUtils;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -51,17 +51,17 @@ public class FilteringOperatorsTest {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
                 subscriber.onNext(1);
-                Utils.sleep(500);
+                OperatorUtils.sleep(500);
 
                 subscriber.onNext(2);
-                Utils.sleep(100);
+                OperatorUtils.sleep(100);
                 subscriber.onNext(3);
-                Utils.sleep(200);
+                OperatorUtils.sleep(200);
                 subscriber.onNext(4);
-                Utils.sleep(300);
+                OperatorUtils.sleep(300);
                 subscriber.onNext(5);
 
-                Utils.sleep(500);
+                OperatorUtils.sleep(500);
                 subscriber.onNext(6);
                 subscriber.onCompleted();
             }
@@ -90,7 +90,7 @@ public class FilteringOperatorsTest {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
                 subscriber.onNext(1);
-                Utils.sleep(2000);
+                OperatorUtils.sleep(2000);
                 //2所对应的timer Observable还未结束，3已经开始发送，因此2将被废弃
                 subscriber.onNext(2);
                 subscriber.onNext(3);
@@ -282,15 +282,15 @@ public class FilteringOperatorsTest {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
                 subscriber.onNext(1);
-                Utils.sleep(500);
+                OperatorUtils.sleep(500);
                 subscriber.onNext(2);
-                Utils.sleep(500);
+                OperatorUtils.sleep(500);
                 subscriber.onNext(3);
-                Utils.sleep(500);
+                OperatorUtils.sleep(500);
                 subscriber.onNext(4);
-                Utils.sleep(500);
+                OperatorUtils.sleep(500);
                 subscriber.onNext(5);
-                Utils.sleep(500);
+                OperatorUtils.sleep(500);
                 subscriber.onCompleted();
             }
         })
@@ -301,15 +301,15 @@ public class FilteringOperatorsTest {
         Observable<String> observable2 = Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
-                Utils.sleep(250);
+                OperatorUtils.sleep(250);
                 subscriber.onNext("A");
-                Utils.sleep(300);
+                OperatorUtils.sleep(300);
                 subscriber.onNext("B");
-                Utils.sleep(100);
+                OperatorUtils.sleep(100);
                 subscriber.onNext("C");
-                Utils.sleep(1000);
+                OperatorUtils.sleep(1000);
                 subscriber.onNext("D");
-                Utils.sleep(500);
+                OperatorUtils.sleep(500);
                 subscriber.onCompleted();
             }
         })
@@ -341,13 +341,13 @@ public class FilteringOperatorsTest {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
                 subscriber.onNext(1);
-                Utils.sleep(500);
+                OperatorUtils.sleep(500);
                 subscriber.onNext(2);
                 subscriber.onNext(3);
-                Utils.sleep(500);
+                OperatorUtils.sleep(500);
                 subscriber.onNext(4);
                 subscriber.onNext(5);
-                Utils.sleep(500);
+                OperatorUtils.sleep(500);
                 subscriber.onNext(6);
                 subscriber.onCompleted();
             }
@@ -375,13 +375,13 @@ public class FilteringOperatorsTest {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
                 subscriber.onNext(1);
-                Utils.sleep(500);
+                OperatorUtils.sleep(500);
                 subscriber.onNext(2);
                 subscriber.onNext(3);
-                Utils.sleep(500);
+                OperatorUtils.sleep(500);
                 subscriber.onNext(4);
                 subscriber.onNext(5);
-                Utils.sleep(500);
+                OperatorUtils.sleep(500);
                 subscriber.onNext(6);
                 subscriber.onCompleted();
             }

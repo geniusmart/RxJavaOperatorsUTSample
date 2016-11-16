@@ -1,6 +1,6 @@
 package com.geniusmart.rxjava;
 
-import com.geniusmart.rxjava.utils.Utils;
+import com.geniusmart.rxjava.utils.OperatorUtils;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -345,7 +345,7 @@ public class UtilityOperatorsTest {
                 });
 
         //保证所有线程正常执行完毕
-        Utils.sleep(1000);
+        OperatorUtils.sleep(1000);
     }
 
     /**
@@ -360,13 +360,13 @@ public class UtilityOperatorsTest {
         Observable.create(new Observable.OnSubscribe<Integer>() {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
-                Utils.sleep(500);
+                OperatorUtils.sleep(500);
                 subscriber.onNext(1);
-                Utils.sleep(1000);
+                OperatorUtils.sleep(1000);
                 subscriber.onNext(2);
-                Utils.sleep(2000);
+                OperatorUtils.sleep(2000);
                 subscriber.onNext(3);
-                Utils.sleep(3000);
+                OperatorUtils.sleep(3000);
                 subscriber.onCompleted();
             }
         })
@@ -391,7 +391,7 @@ public class UtilityOperatorsTest {
                 subscriber.onNext(2);
                 subscriber.onNext(3);
                 subscriber.onNext(4);
-                Utils.sleep(3000);
+                OperatorUtils.sleep(3000);
                 subscriber.onNext(5);
                 subscriber.onCompleted();
             }
@@ -422,9 +422,9 @@ public class UtilityOperatorsTest {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
                 subscriber.onNext(1);
-                Utils.sleep(1000);
+                OperatorUtils.sleep(1000);
                 subscriber.onNext(2);
-                Utils.sleep(3000);
+                OperatorUtils.sleep(3000);
                 subscriber.onNext(3);
                 subscriber.onCompleted();
             }

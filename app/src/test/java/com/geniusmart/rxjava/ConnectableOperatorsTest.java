@@ -1,6 +1,6 @@
 package com.geniusmart.rxjava;
 
-import com.geniusmart.rxjava.utils.Utils;
+import com.geniusmart.rxjava.utils.OperatorUtils;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -79,9 +79,9 @@ public class ConnectableOperatorsTest {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
                 subscriber.onNext(1);
-                Utils.sleep(3000);
+                OperatorUtils.sleep(3000);
                 subscriber.onNext(2);
-                Utils.sleep(3000);
+                OperatorUtils.sleep(3000);
                 subscriber.onNext(3);
             }
         }).publish();
@@ -113,7 +113,7 @@ public class ConnectableOperatorsTest {
 
 
         //延时2s执行connect()
-        Utils.sleep(2000);
+        OperatorUtils.sleep(2000);
         System.out.println("Observable 2s后触发connect()");
         connectableObservable.connect();
 
@@ -177,14 +177,14 @@ public class ConnectableOperatorsTest {
                 .subscribeOn(Schedulers.newThread());
 
         Subscription subscribe1 = observable.subscribe(list1::add);
-        Utils.sleep(100);
+        OperatorUtils.sleep(100);
         Subscription subscribe2 = observable.subscribe(list2::add);
 
-        Utils.sleep(400);
+        OperatorUtils.sleep(400);
         subscribe1.unsubscribe();
         subscribe2.unsubscribe();
 
-        Utils.sleep(600);
+        OperatorUtils.sleep(600);
 
         assertEquals(list1, Arrays.asList(0L, 1L));
         assertEquals(list2, Collections.singletonList(1L));
@@ -208,14 +208,14 @@ public class ConnectableOperatorsTest {
                 .subscribeOn(Schedulers.newThread());
 
         Subscription subscribe1 = observable.subscribe(list1::add);
-        Utils.sleep(100);
+        OperatorUtils.sleep(100);
         Subscription subscribe2 = observable.subscribe(list2::add);
 
-        Utils.sleep(400);
+        OperatorUtils.sleep(400);
         subscribe1.unsubscribe();
         subscribe2.unsubscribe();
 
-        Utils.sleep(600);
+        OperatorUtils.sleep(600);
 
         assertEquals(list1, Arrays.asList(0L, 1L));
         assertEquals(list2, Arrays.asList(0L, 1L));
@@ -243,9 +243,9 @@ public class ConnectableOperatorsTest {
             public void call(Subscriber<? super Integer> subscriber) {
                 System.out.println("Observable只执行一次");
                 subscriber.onNext(1);
-                Utils.sleep(3000);
+                OperatorUtils.sleep(3000);
                 subscriber.onNext(2);
-                Utils.sleep(3000);
+                OperatorUtils.sleep(3000);
                 subscriber.onNext(3);
                 subscriber.onCompleted();
             }
@@ -267,7 +267,7 @@ public class ConnectableOperatorsTest {
                 .subscribe();
 
         //延时2s执行connect()
-        Utils.sleep(2000);
+        OperatorUtils.sleep(2000);
         System.out.println("Observable 2s后触发connect()");
         connectableObservable.connect();
 
@@ -297,18 +297,18 @@ public class ConnectableOperatorsTest {
                 subscriber.onNext(1);
                 subscriber.onNext(2);
                 subscriber.onNext(3);
-                Utils.sleep(1000);
+                OperatorUtils.sleep(1000);
                 subscriber.onNext(4);
                 subscriber.onCompleted();
             }
         }).cache().subscribeOn(Schedulers.newThread());
 
         cacheObservable.subscribe(list1::add);
-        Utils.sleep(800);
+        OperatorUtils.sleep(800);
         cacheObservable.subscribe(list2::add);
 
         //确保所有线程能执行完毕
-        Utils.sleep(2000);
+        OperatorUtils.sleep(2000);
         assertEquals(list1, Arrays.asList(1, 2, 3, 4));
         assertEquals(list2, Arrays.asList(1, 2, 3, 4));
     }

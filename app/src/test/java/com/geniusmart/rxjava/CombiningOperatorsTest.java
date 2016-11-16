@@ -1,6 +1,6 @@
 package com.geniusmart.rxjava;
 
-import com.geniusmart.rxjava.utils.Utils;
+import com.geniusmart.rxjava.utils.OperatorUtils;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -80,13 +80,13 @@ public class CombiningOperatorsTest {
             public void call(Subscriber<? super Integer> subscriber) {
                 System.out.println("observable1-->" + Thread.currentThread().getName());
                 subscriber.onNext(1);
-                Utils.sleep(500);
+                OperatorUtils.sleep(500);
                 subscriber.onNext(2);
-                Utils.sleep(1500);
+                OperatorUtils.sleep(1500);
                 subscriber.onNext(3);
-                Utils.sleep(250);
+                OperatorUtils.sleep(250);
                 subscriber.onNext(4);
-                Utils.sleep(500);
+                OperatorUtils.sleep(500);
                 subscriber.onNext(5);
                 subscriber.onCompleted();
             }
@@ -96,13 +96,13 @@ public class CombiningOperatorsTest {
             @Override
             public void call(Subscriber<? super String> subscriber) {
                 System.out.println("observable2-->" + Thread.currentThread().getName());
-                Utils.sleep(250);
+                OperatorUtils.sleep(250);
                 subscriber.onNext("A");
-                Utils.sleep(300);
+                OperatorUtils.sleep(300);
                 subscriber.onNext("B");
-                Utils.sleep(500);
+                OperatorUtils.sleep(500);
                 subscriber.onNext("C");
-                Utils.sleep(100);
+                OperatorUtils.sleep(100);
                 subscriber.onNext("D");
                 subscriber.onCompleted();
             }
@@ -134,13 +134,13 @@ public class CombiningOperatorsTest {
             public void call(Subscriber<? super Integer> subscriber) {
                 System.out.println("observable1-->" + Thread.currentThread().getName());
                 subscriber.onNext(1);
-                Utils.sleep(500);
+                OperatorUtils.sleep(500);
                 subscriber.onNext(2);
-                Utils.sleep(100);
+                OperatorUtils.sleep(100);
                 subscriber.onNext(3);
-                Utils.sleep(500);
+                OperatorUtils.sleep(500);
                 subscriber.onNext(4);
-                Utils.sleep(500);
+                OperatorUtils.sleep(500);
                 subscriber.onCompleted();
             }
         }).subscribeOn(mTestScheduler).doOnNext(System.out::println);
@@ -149,11 +149,11 @@ public class CombiningOperatorsTest {
             @Override
             public void call(Subscriber<? super String> subscriber) {
                 System.out.println("observable2-->" + Thread.currentThread().getName());
-                Utils.sleep(250);
+                OperatorUtils.sleep(250);
                 subscriber.onNext("A");
-                Utils.sleep(600);
+                OperatorUtils.sleep(600);
                 subscriber.onNext("B");
-                Utils.sleep(200);
+                OperatorUtils.sleep(200);
                 subscriber.onNext("C");
                 subscriber.onCompleted();
             }
@@ -166,7 +166,7 @@ public class CombiningOperatorsTest {
                     @Override
                     public void call(Subscriber<? super Integer> subscriber) {
                         subscriber.onNext(num);
-                        Utils.sleep(300);
+                        OperatorUtils.sleep(300);
                         subscriber.onCompleted();
                     }
                 }).subscribeOn(mTestScheduler);
@@ -178,7 +178,7 @@ public class CombiningOperatorsTest {
                     @Override
                     public void call(Subscriber<? super String> subscriber) {
                         subscriber.onNext(s);
-                        Utils.sleep(300);
+                        OperatorUtils.sleep(300);
                         subscriber.onCompleted();
                     }
                 }).subscribeOn(mTestScheduler);
@@ -276,9 +276,9 @@ public class CombiningOperatorsTest {
                     @Override
                     public void call(Subscriber<? super Observable<? extends Object>> subscriber) {
                         subscriber.onNext(o1);
-                        Utils.sleep(1500);
+                        OperatorUtils.sleep(1500);
                         subscriber.onNext(o2);
-                        Utils.sleep(3000);
+                        OperatorUtils.sleep(3000);
                         subscriber.onCompleted();
                     }
                 });
@@ -300,13 +300,13 @@ public class CombiningOperatorsTest {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
                 subscriber.onNext(1);
-                Utils.sleep(500);
+                OperatorUtils.sleep(500);
                 subscriber.onNext(2);
-                Utils.sleep(1500);
+                OperatorUtils.sleep(1500);
                 subscriber.onNext(3);
-                Utils.sleep(250);
+                OperatorUtils.sleep(250);
                 subscriber.onNext(4);
-                Utils.sleep(500);
+                OperatorUtils.sleep(500);
                 subscriber.onNext(5);
             }
         }).subscribeOn(mTestScheduler).doOnNext(System.out::println);
@@ -314,13 +314,13 @@ public class CombiningOperatorsTest {
         Observable<String> observable2 = Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
-                Utils.sleep(250);
+                OperatorUtils.sleep(250);
                 subscriber.onNext("A");
-                Utils.sleep(300);
+                OperatorUtils.sleep(300);
                 subscriber.onNext("B");
-                Utils.sleep(500);
+                OperatorUtils.sleep(500);
                 subscriber.onNext("C");
-                Utils.sleep(100);
+                OperatorUtils.sleep(100);
                 subscriber.onNext("D");
             }
         }).subscribeOn(Schedulers.newThread()).doOnNext(System.out::println);
