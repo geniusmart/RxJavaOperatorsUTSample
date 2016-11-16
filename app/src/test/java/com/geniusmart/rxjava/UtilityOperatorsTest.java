@@ -17,6 +17,7 @@ import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 import rx.schedulers.TestScheduler;
 
+import static com.geniusmart.rxjava.utils.OperatorUtils.logThread;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
@@ -258,14 +259,14 @@ public class UtilityOperatorsTest {
         Observable.create(new Observable.OnSubscribe<Integer>() {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
-                System.out.println("Observable's Thread = " + Thread.currentThread().getName());
+                OperatorUtils.logThread("Observable");
                 subscriber.onNext(1);
                 subscriber.onCompleted();
             }
         })
                 .observeOn(Schedulers.newThread())
                 .subscribe((num) -> {
-                    System.out.println("Subscriber's Thread = " + Thread.currentThread().getName());
+                    OperatorUtils.logThread("Subscriber");
                 });
     }
 
@@ -307,14 +308,14 @@ public class UtilityOperatorsTest {
         Observable.create(new Observable.OnSubscribe<Integer>() {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
-                System.out.println("Observable's Thread = " + Thread.currentThread().getName());
+                logThread("Observable");
                 subscriber.onNext(1);
                 subscriber.onCompleted();
             }
         })
                 .subscribeOn(Schedulers.newThread())
                 .subscribe((num) -> {
-                    System.out.println("Subscriber's Thread = " + Thread.currentThread().getName());
+                    logThread("Subscriber");
                 });
     }
 
@@ -328,20 +329,20 @@ public class UtilityOperatorsTest {
         Observable.create(new Observable.OnSubscribe<Integer>() {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
-                System.out.println("Observable's Thread = " + Thread.currentThread().getName());
+                logThread("Observable");
                 subscriber.onNext(1);
                 subscriber.onCompleted();
             }
         })
                 .observeOn(Schedulers.io())//决定了map()的线程
                 .map(num -> {
-                    System.out.println("map's Thread = " + Thread.currentThread().getName());
+                    logThread("map");
                     return num;
                 })
                 .subscribeOn(Schedulers.newThread())//决定了消息源的线程
                 .observeOn(Schedulers.computation())//决定了订阅者的线程
                 .subscribe((num) -> {
-                    System.out.println("Subscriber's Thread = " + Thread.currentThread().getName());
+                    logThread("Subscriber");
                 });
 
         //保证所有线程正常执行完毕

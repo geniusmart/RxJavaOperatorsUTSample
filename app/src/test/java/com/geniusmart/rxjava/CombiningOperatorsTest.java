@@ -78,7 +78,7 @@ public class CombiningOperatorsTest {
         Observable<Integer> observable1 = Observable.create(new Observable.OnSubscribe<Integer>() {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
-                System.out.println("observable1-->" + Thread.currentThread().getName());
+                OperatorUtils.logThread("observable1");
                 subscriber.onNext(1);
                 OperatorUtils.sleep(500);
                 subscriber.onNext(2);
@@ -95,7 +95,7 @@ public class CombiningOperatorsTest {
         Observable<String> observable2 = Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
-                System.out.println("observable2-->" + Thread.currentThread().getName());
+                OperatorUtils.logThread("observable2");
                 OperatorUtils.sleep(250);
                 subscriber.onNext("A");
                 OperatorUtils.sleep(300);
@@ -132,7 +132,7 @@ public class CombiningOperatorsTest {
         Observable<Integer> o1 = Observable.create(new Observable.OnSubscribe<Integer>() {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
-                System.out.println("observable1-->" + Thread.currentThread().getName());
+                OperatorUtils.logThread("observable1");
                 subscriber.onNext(1);
                 OperatorUtils.sleep(500);
                 subscriber.onNext(2);
@@ -148,7 +148,7 @@ public class CombiningOperatorsTest {
         Observable<String> o2 = Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
-                System.out.println("observable2-->" + Thread.currentThread().getName());
+                OperatorUtils.logThread("observable2");
                 OperatorUtils.sleep(250);
                 subscriber.onNext("A");
                 OperatorUtils.sleep(600);

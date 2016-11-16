@@ -12,4 +12,8 @@ public class OperatorUtils {
             e.printStackTrace();
         }
     }
+
+    public static void logThread(String name){
+        System.out.println(name + " from " + Thread.currentThread().getName());
+    }
 }
