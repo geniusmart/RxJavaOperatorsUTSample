@@ -37,7 +37,6 @@
 
     mTestScheduler.advanceTimeBy(100, TimeUnit.SECONDS);
     assertEquals(mList, Arrays.asList("1◇", "1◇", "2◇", "3◇", "2◇", "3◇"));
-    System.out.println(mList);
   ```
 
  - concatMap 的 UT 实现：
@@ -51,7 +50,6 @@
 
     mTestScheduler.advanceTimeBy(100, TimeUnit.SECONDS);
     assertEquals(mList, Arrays.asList("1◇", "1◇", "2◇", "2◇", "3◇", "3◇"));
-    System.out.println(mList);
   ```
 2. TODO
 
