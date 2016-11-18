@@ -11,7 +11,7 @@
 - 有目的性的输入与输出
   * 尽可能使用官方操作符的宝蓝图实现精确的输入和输出，如 `connect` 、 `replay` 、 `flatMap` 、 `concatMap` 等
   * 部分操作符使用 [RxMarbles](http://rxmarbles.com/) 进行实现，如 `combineLatest` 、 `amb` 等
-- 一宝蓝图无法完全涵盖知识点的，配备了更多的 UT 和参考文章，如 `repeatWhen` 、 `retryWhen` 、 `defer` 等
+- 对于宝蓝图无法完全涵盖知识点的操作符，配备了更多的 UT 和参考文章，如 `repeatWhen` 、 `retryWhen` 、 `defer` 等
 
 ##预备知识
 - 测试线程和 RxJava 操作符所在线程如何顺利的执行完毕
