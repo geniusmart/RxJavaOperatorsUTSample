@@ -15,11 +15,13 @@
 - 预备知识的相关例子请查看 [ThreadTheory](https://github.com/geniusmart/RxJavaOperatorsUTSample/blob/master/app/src/test/java/com/geniusmart/rxjava/utils/ThreadTheory.java)
 
 ##Example
-1. 区分 flatMap 和 concatMap 的宝蓝图
+1. 对比 flatMap 和 concatMap 的宝蓝图
+ - flatMap
 ![flatMap](http://reactivex.io/documentation/operators/images/mergeMap.png)
+ - concatMap
 ![concatMap](http://reactivex.io/documentation/operators/images/concatMap.png)
  - 在这两张宝蓝图中，输入是完全一样的，但是输出结果不一致，concatMap 变换后保持原有的输入顺序，而flatMap则不然，使用 UT 分别来实现这两张宝蓝图：
- - flatMap的实现：
+ - flatMap 的 UT 实现：
   ```java
     Observable.just(1, 2, 3)
             .flatMap((Func1<Integer, Observable<?>>) num -> Observable.interval(num - 1,
@@ -33,7 +35,7 @@
     System.out.println(mList);
   ```
 
- - concatMap的实现：
+ - concatMap 的 UT 实现：
   ```java
   Observable.just(1, 2, 3)
             .concatMap((Func1<Integer, Observable<?>>) num -> Observable.interval(num - 1,
