@@ -11,10 +11,42 @@
 ##预备知识
 - 测试线程和 RxJava 操作符所在线程如何顺利的执行完毕
 - RxJava 提供的 `TestScheduler` 的用法
+- 聚合操作符中的线程如何处理
 - 预备知识的相关例子请查看 [ThreadTheory](https://github.com/geniusmart/RxJavaOperatorsUTSample/blob/master/app/src/test/java/com/geniusmart/rxjava/utils/ThreadTheory.java)
 
 ##Example
-- TODO
+1. 区分 flatMap 和 concatMap 的宝蓝图
+![flatMap](http://reactivex.io/documentation/operators/images/mergeMap.png)
+![concatMap](http://reactivex.io/documentation/operators/images/concatMap.png)
+ - 在这两张宝蓝图中，输入是完全一样的，但是输出结果不一致，concatMap 变换后保持原有的输入顺序，而flatMap则不然，使用 UT 分别来实现这两张宝蓝图：
+ - flatMap的实现：
+  ```java
+    Observable.just(1, 2, 3)
+            .flatMap((Func1<Integer, Observable<?>>) num -> Observable.interval(num - 1,
+                    TimeUnit.SECONDS, mTestScheduler)
+                    .take(2)
+                    .map(value -> num + "◇"))
+            .subscribe(mList::add);
+
+    mTestScheduler.advanceTimeBy(100, TimeUnit.SECONDS);
+    assertEquals(mList, Arrays.asList("1◇", "1◇", "2◇", "3◇", "2◇", "3◇"));
+    System.out.println(mList);
+  ```
+
+ - concatMap的实现：
+  ```java
+  Observable.just(1, 2, 3)
+            .concatMap((Func1<Integer, Observable<?>>) num -> Observable.interval(num - 1,
+                    TimeUnit.SECONDS, mTestScheduler)
+                    .take(2)
+                    .map(value -> num + "◇"))
+            .subscribe(mList::add);
+
+    mTestScheduler.advanceTimeBy(100, TimeUnit.SECONDS);
+    assertEquals(mList, Arrays.asList("1◇", "1◇", "2◇", "2◇", "3◇", "3◇"));
+    System.out.println(mList);
+  ```
+2. TODO
 
 ##所涵盖的操作符
 - Creating Observables
