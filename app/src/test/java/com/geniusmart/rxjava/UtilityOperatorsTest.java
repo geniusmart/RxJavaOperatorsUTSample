@@ -14,6 +14,8 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.functions.Action1;
+import rx.functions.Func0;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.schedulers.TestScheduler;
 
@@ -436,14 +438,37 @@ public class UtilityOperatorsTest {
     }
 
     /**
-     * TODO-using
      * create a disposable resource that has the same lifespan as the Observable
+     * <p/>
+     * using 操作函数用来管理资源，如果一个 Observable 需要使用一个资源来发射数据（比如 需要使用一个文件资源，从文件中读取内容），当该 Observable
+     * 结束的时候（不管是正常结束还是异常结束）就释放该资源。这样你就不用自己管理资源了， 用 Rx 的方式来管理资源。
      *
      * @see <a href="http://reactivex.io/documentation/operators/using.html">ReactiveX operators
      * documentation: Using</a>
+     * @see <a href="http://blog.chengyunfeng.com/?p=970">Using</a>
      */
     @Test
     public void using() {
+        Observable.using(new Func0<String>() {//resourceFactory 用来获取到需要的资源
+                             @Override
+                             public String call() {
+                                 String resource = "resource";
+                                 System.out.println("resourceFactory-->" + resource);
+                                 return resource;
+                             }
+                         }, new Func1<String, Observable<?>>() {//observableFactory 用这个资源来发射数据
+                             @Override
+                             public Observable<?> call(String resource) {
+                                 System.out.println("observableFactory-->" + resource);
+                                 return Observable.just(resource);
+                             }
+                         }, new Action1<String>() {//当 Observable 完成的时候，disposeAction 来释放资源
 
+                             @Override
+                             public void call(String resource) {
+                                 System.out.println("disposeAction-->" + resource);
+                             }
+                         }
+        ).subscribe(System.out::println);
     }
 }

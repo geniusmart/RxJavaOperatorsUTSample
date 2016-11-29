@@ -25,7 +25,7 @@ public class SubjectTest {
     }
 
     @Test
-    public void ReplaySubject(){
+    public void replaySubject(){
         ReplaySubject<Integer> replaySubject = ReplaySubject.create();
         replaySubject.onNext(1);
         replaySubject.onNext(2);
