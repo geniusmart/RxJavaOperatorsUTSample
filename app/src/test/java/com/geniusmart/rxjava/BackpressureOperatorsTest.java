@@ -1,5 +1,6 @@
 package com.geniusmart.rxjava;
 
+import com.geniusmart.rxjava.utils.ControlledPullSubscriber;
 import com.geniusmart.rxjava.utils.OperatorUtils;
 
 import org.junit.Before;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
+import rx.Subscriber;
 import rx.schedulers.Schedulers;
 import rx.schedulers.TestScheduler;
 
@@ -33,18 +35,38 @@ public class BackpressureOperatorsTest {
     }
 
     @Test
-    public void doOnRequest() {
-        Observable.range(0, 300)
-                .doOnRequest(i -> System.out.println(this.toString() + "--Requested " + i))
-                .zipWith(
-                        Observable.range(10, 300),
-                        (i1, i2) -> i1 + " - " + i2)
-                .take(300)
-                .subscribe();
+    public void onBackpressureBuffer() {
+
+        ControlledPullSubscriber<Integer> puller =
+                new ControlledPullSubscriber<>(System.out::println);
+
+        Observable.create(new Observable.OnSubscribe<Integer>() {
+            @Override
+            public void call(Subscriber<? super Integer> subscriber) {
+                subscriber.onNext(1);
+                subscriber.onNext(2);
+                subscriber.onNext(3);
+                OperatorUtils.sleep(5000);
+                subscriber.onNext(4);
+                subscriber.onNext(5);
+
+            }
+        })
+                .onBackpressureDrop()
+                .observeOn(Schedulers.newThread())
+                .subscribeOn(Schedulers.newThread())
+                .subscribe(puller);
+
+        OperatorUtils.sleep(3000);
+        puller.requestMore(1);
+        OperatorUtils.sleep(3000);
+        puller.requestMore(1);
+        OperatorUtils.sleep(1000);
+
     }
 
     @Test
-    public void onBackpressureBuffer() {
+    public void onBackpressureBuffer1() {
         Observable.interval(1, TimeUnit.MILLISECONDS)
                 .onBackpressureBuffer(1000)
                 .observeOn(Schedulers.newThread())
@@ -58,7 +80,7 @@ public class BackpressureOperatorsTest {
 
     //http://blog.chengyunfeng.com/?p=981
     @Test
-    public void onBackpressureDrop() {
+    public void onBackpressureDrop1() {
         Observable.interval(1, TimeUnit.MILLISECONDS)
                 .onBackpressureDrop()
                 .observeOn(Schedulers.newThread())

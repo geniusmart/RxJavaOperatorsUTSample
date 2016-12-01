@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -130,15 +131,73 @@ public class UtilityOperatorsTest {
 
     }
 
-    //TODO-doOnRequest-参考http://blog.chengyunfeng.com/?p=981
+    /**
+     * 当 Subscriber请求获取数据的时候， doOnRequest就会被调用。参数中的值为请求的数量。
+     *
+     * @see <a href="http://blog.chengyunfeng.com/?p=981">RxJava 教程第四部分</a>
+     */
     @Test
-    public void doOnRequest() {
-        Observable.just(1, 2, 3, 4, 5, 6)
-                .doOnRequest(new Action1<Long>() {
-                    @Override
-                    public void call(Long aLong) {
-                    }
-                });
+    public void doOnRequest_without_backpressure() {
+        Observable.just(1, 2, 3)
+                .doOnRequest(aLong -> {
+                    //请求了大量的数据，代表没有使用backpressure模型
+                    System.out.println("doOnRequest->" + aLong);
+                })
+                .subscribe(System.out::println);
+    }
+
+    /**
+     * Subscriber主动调用request(n)请求数据
+     * @see <a href="http://blog.chengyunfeng.com/?p=981">RxJava 教程第四部分</a>
+     */
+    @Test
+    public void doOnRequest_with_backpressure() {
+
+        abstract class PullSubscriber<T> extends Subscriber<T> {
+            @Override
+            public void onStart() {
+                request(0);
+            }
+
+            public void requestMore(int n) {
+                request(n);
+            }
+        }
+
+        PullSubscriber<Integer> subscriber = new PullSubscriber<Integer>() {
+
+            public void onStart() {
+                request(0);
+            }
+
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(Integer integer) {
+                mList.add(integer);
+                System.out.println("onNext=>" + integer);
+            }
+        };
+
+        Observable.range(1, 10)
+                .doOnRequest(aLong -> {
+                    System.out.println("doOnRequest->" + aLong);
+                })
+                .subscribe(subscriber);//此时Observable并不会发射数据
+
+        subscriber.requestMore(1);//请求1个数据
+        assertEquals(mList, Collections.singletonList(1));
+        subscriber.requestMore(2);//请求2个数据
+        assertEquals(mList,Arrays.asList(1,2,3));
+
     }
 
     /**
