@@ -40,29 +40,58 @@ public class BackpressureOperatorsTest {
         ControlledPullSubscriber<Integer> puller =
                 new ControlledPullSubscriber<>(System.out::println);
 
+        Subscriber<Integer> subscriber = new Subscriber<Integer>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+            }
+
+            @Override
+            public void onNext(Integer integer) {
+                OperatorUtils.logThread("Subscriber");
+                System.out.println("Subscriber"+integer);
+                OperatorUtils.sleep(200);
+            }
+        };
+
         Observable.create(new Observable.OnSubscribe<Integer>() {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
-                subscriber.onNext(1);
-                subscriber.onNext(2);
-                subscriber.onNext(3);
-                OperatorUtils.sleep(5000);
-                subscriber.onNext(4);
-                subscriber.onNext(5);
+                OperatorUtils.logThread("Observable");
+                for(int i=1;i<1000000;i++){
+                    System.out.println("Observable emit "+i);
+                    subscriber.onNext(i);
+                }
+
+                //OperatorUtils.sleep(2000);
+
+                for(int i=1;i<10000;i++){
+                    subscriber.onNext(2);
+                }
 
             }
         })
-                .onBackpressureDrop()
-                .observeOn(Schedulers.newThread())
+                //.onBackpressureDrop()
                 .subscribeOn(Schedulers.newThread())
-                .subscribe(puller);
+                .observeOn(Schedulers.newThread())
+                .subscribe(subscriber);
 
-        OperatorUtils.sleep(3000);
-        puller.requestMore(1);
-        OperatorUtils.sleep(3000);
-        puller.requestMore(1);
-        OperatorUtils.sleep(1000);
-
+//        puller.requestMore(1);
+//        puller.requestMore(1);
+//        OperatorUtils.sleep(3000);
+//        puller.requestMore(1);
+//        OperatorUtils.sleep(3000);
+//        puller.requestMore(1);
+//        OperatorUtils.sleep(3000);
+//        puller.requestMore(1);
+//        OperatorUtils.sleep(3000);
+//        puller.requestMore(10);
+//        OperatorUtils.sleep(3000);
+        OperatorUtils.sleep(1000000);
     }
 
     @Test
@@ -93,7 +122,39 @@ public class BackpressureOperatorsTest {
                             }
                         },
                         System.out::println);
-        OperatorUtils.sleep(50000);
+        OperatorUtils.sleep(2000);
+    }
+
+    @Test
+    public void onBackpressureDrop2() {
+        Observable.interval(1, TimeUnit.MILLISECONDS)
+                .onBackpressureDrop()
+                .observeOn(Schedulers.newThread())
+                .subscribe(
+                        i -> {
+                            System.out.println(i);
+                            try {
+                                Thread.sleep(100);
+                            } catch (Exception e) {
+                            }
+                        },
+                        System.out::println);
+        OperatorUtils.sleep(30000);
+    }
+
+    @Test
+    public void test1(){
+        Observable.interval(1, TimeUnit.MILLISECONDS)
+                .observeOn(Schedulers.newThread())
+                .subscribe(
+                        i -> {
+                            System.out.println(i);
+                            try {
+                                Thread.sleep(100);
+                            } catch (Exception e) { }
+                        },
+                        System.out::println);
+        OperatorUtils.sleep(2000);
     }
 
 }
