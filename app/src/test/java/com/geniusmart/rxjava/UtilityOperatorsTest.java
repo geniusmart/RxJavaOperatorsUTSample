@@ -75,7 +75,11 @@ public class UtilityOperatorsTest {
         Observable.just(1, 2, 1)
                 .delay(integer -> Observable.timer(integer * 20, TimeUnit.SECONDS, mTestScheduler))
                 .subscribe(mList::add);
-        mTestScheduler.advanceTimeBy(3000, TimeUnit.SECONDS);
+
+        mTestScheduler.advanceTimeTo(20, TimeUnit.SECONDS);
+        assertEquals(mList, Arrays.asList(1, 1));
+
+        mTestScheduler.advanceTimeTo(40, TimeUnit.SECONDS);
         assertEquals(mList, Arrays.asList(1, 1, 2));
     }
 

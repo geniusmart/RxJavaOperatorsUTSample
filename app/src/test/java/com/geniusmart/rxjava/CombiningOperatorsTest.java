@@ -198,7 +198,7 @@ public class CombiningOperatorsTest {
     /**
      * combine multiple Observables into one by merging their emissions
      *
-     * @see <a href = "http://rxmarbles.com/#merge">RxMarbles combineLatest merge</a>
+     * @see <a href = "http://rxmarbles.com/#merge">RxMarbles merge</a>
      * @see <a href="http://reactivex.io/documentation/operators/merge.html">ReactiveX operators
      * documentation: Merge</a>
      */
@@ -209,9 +209,9 @@ public class CombiningOperatorsTest {
                 .map(aLong -> (aLong + 1) * 20)
                 .doOnNext(System.out::println);
 
-        Observable<Integer> observable2 = Observable.interval(18, TimeUnit.SECONDS, mTestScheduler)
+        Observable<Long> observable2 = Observable.interval(18, TimeUnit.SECONDS, mTestScheduler)
                 .take(2)
-                .map(aLong -> 1)
+                .map(aLong -> 1L)
                 .doOnNext(System.out::println);
 
         Observable.merge(observable1, observable2).subscribe(mList::add);
