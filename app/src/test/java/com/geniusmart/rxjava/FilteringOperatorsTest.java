@@ -80,7 +80,7 @@ public class FilteringOperatorsTest {
      * If the source Observable emits another item before this newly-generated Observable
      * terminates, debounce will suppress the item.
      * <p/>
-     * 根据官方宝蓝图实现
+     * 根据官方 marble diagrams 实现
      *
      * @see <a href="http://reactivex.io/documentation/operators/images/debounce.f.png">debounce.png</a>
      */
@@ -331,7 +331,7 @@ public class FilteringOperatorsTest {
      * Returns an Observable that emits only the first item emitted by the source Observable during
      * sequential time windows of a specified duration.
      * <p/>
-     * 根据官方宝蓝图实现
+     * 根据官方 marble diagrams 实现
      *
      * @see <a href="http://reactivex.io/documentation/operators/images/throttleFirst.png">throttleFirst.png</a>
      */
@@ -367,7 +367,7 @@ public class FilteringOperatorsTest {
      * sequential
      * time windows of a specified duration.
      * <p/>
-     * 根据throttleFirst的官方宝蓝图实现
+     * 根据throttleFirst的官方 marble diagrams 实现
      */
     @Test
     public void throttleLast() {

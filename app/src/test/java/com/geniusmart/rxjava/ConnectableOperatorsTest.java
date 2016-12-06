@@ -62,7 +62,7 @@ public class ConnectableOperatorsTest {
     /**
      * instruct a connectable Observable to begin emitting items to its subscribers
      * <p/>
-     * 此例子根据connect的官方宝蓝图进行实现
+     * 此例子根据connect的官方 marble diagrams 进行实现
      *
      * @see <a href="http://reactivex.io/documentation/operators/images/publishConnect.png">connect.png</a>
      * @see <a href="http://reactivex.io/documentation/operators/connect.html">connect</a>
@@ -125,7 +125,7 @@ public class ConnectableOperatorsTest {
     /**
      * make a Connectable Observable behave like an ordinary Observable
      * <p/>
-     * 此用例介绍refCount的概念，官方宝蓝图的实现详见refCount2()用例
+     * 此用例介绍refCount的概念，官方 marble diagrams 的实现详见refCount2()用例
      *
      * @see <a href="http://reactivex.io/documentation/operators/refcount.html">ReactiveX
      * documentation: RefCount</a>
@@ -154,7 +154,7 @@ public class ConnectableOperatorsTest {
     /**
      * make a Connectable Observable behave like an ordinary Observable
      * <p/>
-     * 此例子根据connect的官方宝蓝图进行实现，refCount将ConnectableObservable转换为普通的Observable，
+     * 此例子根据connect的官方 marble diagrams 进行实现，refCount将ConnectableObservable转换为普通的Observable，
      * 但仍然保持了hot数据流的特点，可对比下文的without_public_and_refCount()中cold数据流的区别
      *
      * @see <a href="http://reactivex.io/documentation/operators/images/publishRefCount.c.png">RefCount.png</a>
@@ -226,7 +226,7 @@ public class ConnectableOperatorsTest {
      * ensure that all observers see the same sequence of emitted items, even if they subscribe
      * after the Observable has begun emitting items
      * <p>
-     * 此例子根据replay的官方宝蓝图进行实现
+     * 此例子根据replay的官方 marble diagrams 进行实现
      *
      * @see <a href="http://reactivex.io/documentation/operators/images/replay.png">replay.png</a>
      * @see <a href="http://reactivex.io/documentation/operators/replay.html">ReactiveX operators
@@ -281,7 +281,7 @@ public class ConnectableOperatorsTest {
      * <p>
      * cache操作函数和replay类似，但无需使用ConnectableObservable
      * <p>
-     * 此例子实现了该宝蓝图：https://raw.githubusercontent.com/wiki/ReactiveX/RxJava/images/rx-operators/cache.png
+     * 此例子实现了该 marble diagrams ：https://raw.githubusercontent.com/wiki/ReactiveX/RxJava/images/rx-operators/cache.png
      */
     @Test
     public void cache() {

@@ -254,7 +254,7 @@ public class CombiningOperatorsTest {
      * convert an Observable that emits Observables into a single Observable that emits the items
      * emitted by the most-recently-emitted of those Observables
      * <p>
-     * 此例根据官方宝蓝图实现
+     * 此例根据官方 marble diagrams 实现
      *
      * @see <a href="http://reactivex.io/documentation/operators/images/switch.c.png">switch.png</a>
      */

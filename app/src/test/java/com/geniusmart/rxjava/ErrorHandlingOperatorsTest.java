@@ -37,7 +37,7 @@ public class ErrorHandlingOperatorsTest {
      * instructs an Observable to emit a particular item when it encounters an error, and then
      * terminate normally
      * <p>
-     * 根据官方宝蓝图实现
+     * 根据官方 marble diagrams 实现
      *
      * @see <a href="http://reactivex.io/documentation/operators/catch.html">ReactiveX operators
      * documentation: Catch</a>
@@ -62,7 +62,7 @@ public class ErrorHandlingOperatorsTest {
      * instructs an Observable to begin emitting a second Observable sequence if it encounters an
      * error
      * <p>
-     * 根据官方宝蓝图实现
+     * 根据官方 marble diagrams 实现
      *
      * @see <a href="http://reactivex.io/documentation/operators/catch.html">ReactiveX operators
      * documentation: Catch</a>

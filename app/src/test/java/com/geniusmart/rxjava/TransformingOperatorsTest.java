@@ -126,7 +126,7 @@ public class TransformingOperatorsTest {
     /**
      * transform the items emitted by an Observable into Observables, then flatten the
      * emissions from those into a single Observable
-     * <p/>根据官方宝蓝图进行实现
+     * <p/>根据官方 marble diagrams 进行实现
      *
      * @see <a href="http://reactivex.io/documentation/operators/flatmap.html">ReactiveX operators
      * documentation: FlatMap</a>
@@ -150,7 +150,7 @@ public class TransformingOperatorsTest {
      * There is also a concatMap operator, which is like the simpler version of the flatMap
      * operator, but it concatenates rather than merges the resulting Observables in order to
      * generate its own sequence.
-     * <p/>根据官方宝蓝图进行实现
+     * <p/>根据官方 marble diagrams 进行实现
      * <p/>
      * concatMap与flatMap的区别在于，concatMap可以保持Observable发送时的顺序，而flatMap可能会交错的
      * 发送数据流
@@ -175,7 +175,7 @@ public class TransformingOperatorsTest {
      * It behaves much like flatMap, except that whenever a new item is emitted by the source
      * Observable, it will unsubscribe to and stop mirroring the Observable that was generated
      * from the previously-emitted item, and begin only mirroring the current one.
-     * <p/>根据官方宝蓝图进行实现
+     * <p/>根据官方 marble diagrams 进行实现
      *
      * @see <a href="http://reactivex.io/documentation/operators/images/switchMap.png">switchMap.png</a>
      */

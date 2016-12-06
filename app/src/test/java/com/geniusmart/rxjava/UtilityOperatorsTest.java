@@ -320,7 +320,7 @@ public class UtilityOperatorsTest {
     }
 
     /**
-     * 根据官方宝蓝图实现
+     * 根据官方 marble diagrams 实现
      *
      * @see <a href="http://reactivex.io/documentation/operators/images/schedulers.png">schedulers.png</a>
      */
