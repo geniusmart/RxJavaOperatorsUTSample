@@ -22,19 +22,19 @@ public class ThreadTheory {
     public void test_thread_early() {
 
         //测试线程启动
-        System.out.println("Test thread begin!");
+        System.out.println("测试线程-start");
 
-        //测试线程结束后，子线程还未执行完毕，因此无法完整的输出测试结果
         new Thread(new Runnable() {
             @Override
             public void run() {
-                System.out.println("other thread begin!");
+                System.out.println("子线程-start");
                 OperatorUtils.sleep(3000);
-                System.out.println("other thread end!");
+                System.out.println("子线程-end");
             }
         }).start();
 
-        System.out.println("Test thread end!");
+        //测试线程结束后，子线程还未执行完毕，因此子线程无法完整的输出测试结果
+        System.out.println("测试线程-end");
     }
 
     /**
@@ -44,20 +44,20 @@ public class ThreadTheory {
     public void test_thread_late() {
 
         //测试线程启动，线程体需执行4s钟
-        System.out.println("Test thread begin!");
+        System.out.println("测试线程-start");
 
         //子线程能顺利执行完毕
         new Thread(new Runnable() {
             @Override
             public void run() {
-                System.out.println("Other thread begin!");
+                System.out.println("子线程-start");
                 OperatorUtils.sleep(3000);
-                System.out.println("Other thread end!");
+                System.out.println("子线程-end");
             }
         }).start();
 
         OperatorUtils.sleep(4000);
-        System.out.println("Test thread end!");
+        System.out.println("测试线程-end");
     }
 
     /**
@@ -65,11 +65,12 @@ public class ThreadTheory {
      */
     @Test
     public void test_thread_early_observable() {
-        System.out.println(Thread.currentThread().getName());
+        System.out.println("测试线程：" + Thread.currentThread().getName());
+
         //消息源在Schedulers.computation()线程中执行，3s后执行，此时测试线程已经执行完毕，无法正常输出结果
         Observable.timer(3, TimeUnit.SECONDS)
                 .subscribe(num -> {
-                    System.out.println("Observable和Subscriber线程：" + Thread.currentThread().getName());
+                    System.out.println("Observable和Subscriber所在线程：" + Thread.currentThread().getName());
                     System.out.println("获取订阅数据：" + num);
 
                 });
@@ -110,8 +111,6 @@ public class ThreadTheory {
 
         testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
     }
-
-    //TODO:聚合操作符使用TestShedule不会阻塞测试线程
 
     /**
      * 聚合操作符的线程处理方式一：两个Observable分别在两条子线程中执行，且测试线程的生命周期比2条子线程更长
