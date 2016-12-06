@@ -189,12 +189,12 @@ public class CreatingOperatorsTest {
         Observable.interval(100, TimeUnit.MILLISECONDS, mTestScheduler)
                 .subscribe(mList::add);
 
-        //时间提早500ms前
-        mTestScheduler.advanceTimeBy(500, TimeUnit.MILLISECONDS);
-        assertEquals(mList, Arrays.asList(0L, 1L, 2L, 3L, 4L));
+        //时间提早400ms前
+        mTestScheduler.advanceTimeBy(400, TimeUnit.MILLISECONDS);
+        assertEquals(mList, Arrays.asList(0L, 1L, 2L, 3L));
 
-        //时间提早(500 + 100)ms前
-        mTestScheduler.advanceTimeBy(100, TimeUnit.MILLISECONDS);
+        //时间提早(400 + 200)ms前
+        mTestScheduler.advanceTimeBy(200, TimeUnit.MILLISECONDS);
         assertEquals(mList, Arrays.asList(0L, 1L, 2L, 3L, 4L, 5L));
     }
 

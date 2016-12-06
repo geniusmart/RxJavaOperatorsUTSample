@@ -65,7 +65,7 @@ public class ThreadTheory {
      */
     @Test
     public void test_thread_early_observable() {
-        System.out.println("测试线程：" + Thread.currentThread().getName());
+        System.out.println("测试线程-start,所在线程：" + Thread.currentThread().getName());
 
         //消息源在Schedulers.computation()线程中执行，3s后执行，此时测试线程已经执行完毕，无法正常输出结果
         Observable.timer(3, TimeUnit.SECONDS)
@@ -74,6 +74,7 @@ public class ThreadTheory {
                     System.out.println("获取订阅数据：" + num);
 
                 });
+        System.out.println("测试线程-end");
     }
 
     /**
@@ -82,7 +83,7 @@ public class ThreadTheory {
     @Test
     public void test_thread_late_observable() {
 
-        System.out.println("测试线程：" + Thread.currentThread().getName());
+        System.out.println("测试线程-start,所在线程：" + Thread.currentThread().getName());
         //消息源在Schedulers.computation()线程中执行，3s后执行
         Observable.timer(3, TimeUnit.SECONDS)
                 .subscribe(num -> {
@@ -92,24 +93,27 @@ public class ThreadTheory {
 
         // 测试线程在4s后结束，能保证子线程完整执行
         OperatorUtils.sleep(4000);
+        System.out.println("测试线程-end");
     }
 
     /**
      * 使用TestScheduler将线程设置为测试线程，并将时间提前
      */
     @Test
-    public void test_thread_with_TestSchedule() {
+    public void test_thread_with_TestScheduler() {
 
         TestScheduler testScheduler = Schedulers.test();
         System.out.println("测试线程：" + Thread.currentThread().getName());
-        //消息源在Schedulers.computation()线程中执行，3s后执行，此时测试线程已经执行完毕，无法正常输出结果
+
+        //指定调度器
         Observable.timer(3, TimeUnit.SECONDS, testScheduler)
                 .subscribe(num -> {
                     System.out.println("Observable和Subscriber线程：" + Thread.currentThread().getName());
                     System.out.println("获取订阅数据：" + num);
                 });
 
-        testScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
+        //将时间提前了3s
+        testScheduler.advanceTimeBy(3, TimeUnit.SECONDS);
     }
 
     /**
