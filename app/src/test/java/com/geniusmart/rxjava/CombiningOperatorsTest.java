@@ -111,7 +111,7 @@ public class CombiningOperatorsTest {
         Observable.combineLatest(observable1, observable2,
                 (Func2<Integer, String, Object>) (integer, s) -> integer + s).subscribe(mList::add);
 
-        //测试线程提前一定时间，让observable能顺利开始发送数据
+        //测试线程提前一定时间，让observable1能顺利开始发送数据
         mTestScheduler.advanceTimeBy(10, TimeUnit.MILLISECONDS);
         System.out.println(mList);
         assertEquals(mList, Arrays.asList("1A", "2A", "2B", "2C", "2D", "3D", "4D", "5D"));
