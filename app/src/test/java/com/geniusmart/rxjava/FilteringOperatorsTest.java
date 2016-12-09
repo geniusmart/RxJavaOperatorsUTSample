@@ -54,11 +54,8 @@ public class FilteringOperatorsTest {
                 OperatorUtils.sleep(500);
 
                 subscriber.onNext(2);
-                OperatorUtils.sleep(100);
                 subscriber.onNext(3);
-                OperatorUtils.sleep(200);
                 subscriber.onNext(4);
-                OperatorUtils.sleep(300);
                 subscriber.onNext(5);
 
                 OperatorUtils.sleep(500);
@@ -71,7 +68,8 @@ public class FilteringOperatorsTest {
                 .debounce(400, TimeUnit.MILLISECONDS)
                 .subscribe(mList::add);
 
-        mTestScheduler.advanceTimeBy(10, TimeUnit.SECONDS);
+        // 测试线程将时间提早10ms，可以保证create操作符顺利执行完毕
+        mTestScheduler.advanceTimeBy(10, TimeUnit.MILLISECONDS);
         System.out.println(mList);
         assertEquals(mList, Arrays.asList(1, 5, 6));
     }
