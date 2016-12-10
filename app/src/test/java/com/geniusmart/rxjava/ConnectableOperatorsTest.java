@@ -92,24 +92,20 @@ public class ConnectableOperatorsTest {
                 .subscribe(list1::add);
 
         //延迟6s后再订阅，将只订阅到3的数据流
-        Observable.timer(6, TimeUnit.SECONDS, Schedulers.newThread())
-                .map((Func1<Long, Object>) aLong -> {
+        connectableObservable.delaySubscription(6, TimeUnit.SECONDS, Schedulers.newThread())
+                .doOnSubscribe(()->{
                     System.out.println("Subscriber2-6s后开始订阅数据");
-                    connectableObservable.doOnNext(num -> System.out.println("Subscriber2-->" + num))
-                            .subscribe(list2::add);
-                    return Observable.empty();
                 })
-                .subscribe();
+                .doOnNext(num -> System.out.println("Subscriber2-->" + num))
+                .subscribe(list2::add);
 
         //延迟1s后再订阅，将只订阅到3的数据流
-        Observable.timer(1, TimeUnit.SECONDS, Schedulers.newThread())
-                .map((Func1<Long, Object>) aLong -> {
+        connectableObservable.delaySubscription(1, TimeUnit.SECONDS, Schedulers.newThread())
+                .doOnSubscribe(()->{
                     System.out.println("Subscriber3-1s后开始订阅数据");
-                    connectableObservable.doOnNext(num -> System.out.println("Subscriber3-->" + num))
-                            .subscribe(list3::add);
-                    return Observable.empty();
                 })
-                .subscribe();
+                .doOnNext(num -> System.out.println("Subscriber3-->" + num))
+                .subscribe(list3::add);
 
 
         //延时2s执行connect()
