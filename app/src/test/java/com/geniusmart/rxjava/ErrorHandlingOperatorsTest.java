@@ -136,27 +136,29 @@ public class ErrorHandlingOperatorsTest {
     /**
      * recover from an onError notification by continuing the sequence without error
      *
+     * <p>
+     * 此例子根据replay的官方 marble diagrams 进行实现
      * @see <a href="http://reactivex.io/documentation/operators/retry.html">ReactiveX operators
      * documentation: Retry</a>
      */
     @Test
     public void retry() {
+
+        final Integer[] arrays = {0};
+
         Observable.create(new Observable.OnSubscribe<Integer>() {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
                 subscriber.onNext(1);
                 subscriber.onNext(2);
-                subscriber.onNext(2 / 0);
+                subscriber.onNext(3 / arrays[0]++);
                 subscriber.onCompleted();
             }
         })
-                .retry(2)
-                .subscribe(integer -> {
-                    System.out.println(integer);
-                    mList.add(integer);
-                }, throwable -> System.out.println(throwable.getMessage()));
+                .retry()
+                .subscribe(mList::add);
 
-        assertEquals(mList, Arrays.asList(1, 2, 1, 2, 1, 2));
+        assertEquals(mList, Arrays.asList(1, 2, 1, 2, 3));
     }
 
     /**
