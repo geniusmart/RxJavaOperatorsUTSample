@@ -14,7 +14,6 @@ import java.util.concurrent.TimeUnit;
 import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
-import rx.functions.Func1;
 import rx.observables.ConnectableObservable;
 import rx.schedulers.Schedulers;
 import rx.schedulers.TestScheduler;
@@ -252,15 +251,13 @@ public class ConnectableOperatorsTest {
         connectableObservable.doOnNext(num -> System.out.println("Subscriber1-->" + num))
                 .subscribe(list1::add);
 
-        //延迟6s后再订阅，将只订阅到3的数据流
-        Observable.timer(6, TimeUnit.SECONDS, Schedulers.newThread())
-                .map((Func1<Long, Object>) aLong -> {
+        connectableObservable
+                .delaySubscription(6, TimeUnit.SECONDS, Schedulers.newThread())
+                .doOnSubscribe(()->{
                     System.out.println("Subscriber2-6s后开始订阅数据");
-                    connectableObservable.doOnNext(num -> System.out.println("Subscriber2-->" + num))
-                            .subscribe(list2::add);
-                    return Observable.empty();
                 })
-                .subscribe();
+                .doOnNext(num -> System.out.println("Subscriber2-->" + num))
+                .subscribe(list2::add);
 
         //延时2s执行connect()
         OperatorUtils.sleep(2000);
