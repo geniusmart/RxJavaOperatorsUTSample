@@ -15,6 +15,7 @@ import rx.schedulers.TestScheduler;
 import rx.util.async.Async;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotSame;
 import static junit.framework.Assert.assertTrue;
 
 /**
@@ -76,6 +77,33 @@ public class CreatingOperatorsTest {
      * do not create the Observable until the observer subscribes, and create a fresh Observable
      * for each observer
      * <p/>
+     * 此例子用于说明 defer 产生的数据流都是全新的
+     *
+     * @see <a href="http://reactivex.io/documentation/operators/defer.html">ReactiveX operators
+     * documentation: Defer</a>
+     */
+    @Test
+    public void defer1() {
+
+        List<Observable<Integer>> list = new ArrayList<>();
+
+        Observable<Integer> deferObservable = Observable.defer(() -> {
+            Observable<Integer> observable = Observable.just(1, 2, 3);
+            list.add(observable);
+            return observable;
+        });
+
+        // 两次订阅，每次都将产生全新的Observable
+        deferObservable.subscribe();
+        deferObservable.subscribe();
+
+        assertNotSame(list.get(0), list.get(1));
+    }
+
+    /**
+     * do not create the Observable until the observer subscribes, and create a fresh Observable
+     * for each observer
+     * <p/>
      * 此例子用于说明defer延迟订阅的作用
      *
      * @see <a href="http://reactivex.io/documentation/operators/defer.html">ReactiveX operators
@@ -83,7 +111,7 @@ public class CreatingOperatorsTest {
      * @see <a href="http://www.jianshu.com/p/c83996149f5b">【译】使用RxJava实现延迟订阅</a>
      */
     @Test
-    public void defer() {
+    public void defer2() {
 
         class Person {
             public String name = "nobody";
@@ -103,10 +131,19 @@ public class CreatingOperatorsTest {
         Observable<String> justObservable = person.getJustObservable();
         Observable<String> deferObservable = person.getDeferObservable();
 
+        // 数据改变之前
+        justObservable.subscribe(mList::add);
+        assertEquals(mList, Collections.singletonList("nobody"));
+
+        mList.clear();
+        deferObservable.subscribe(mList::add);
+        assertEquals(mList, Collections.singletonList("nobody"));
+
         person.name = "geniusmart";
 
+        // 数据改变之后
+        mList.clear();
         justObservable.subscribe(mList::add);
-
         assertEquals(mList, Collections.singletonList("nobody"));
 
         mList.clear();
