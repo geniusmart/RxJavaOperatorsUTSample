@@ -13,13 +13,15 @@ import java.util.concurrent.TimeUnit;
 
 import rx.schedulers.Schedulers;
 import rx.schedulers.TestScheduler;
+import rx.subjects.AsyncSubject;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
+import rx.subjects.ReplaySubject;
 
 import static junit.framework.Assert.assertEquals;
 
 /**
- * TODO Subject 是否为hot？
+ * TODO Subject 是否为hot？可以同时充当Observable和Observer？
  * Created by geniusmart on 2016/11/18.
  * http://reactivex.io/documentation/subject.html
  */
@@ -34,6 +36,54 @@ public class SubjectTest {
         mTestScheduler = new TestScheduler();
         mListOne = new ArrayList<>();
         mListTwo = new ArrayList<>();
+    }
+
+    /**
+     * @see <a href="http://reactivex.io/documentation/operators/images/S.AsyncSubject.png">AsyncSubject</a>
+     */
+    @Test
+    public void asyncSubject1() {
+
+        AsyncSubject<Integer> asyncSubject = AsyncSubject.create();
+
+        asyncSubject.subscribe(mListOne::add);
+        asyncSubject.delaySubscription(500, TimeUnit.MILLISECONDS, Schedulers.io())
+                .subscribe(mListTwo::add);
+
+        asyncSubject.onNext(1);
+        asyncSubject.onNext(2);
+        OperatorUtils.sleep(1000);
+        asyncSubject.onNext(3);
+        asyncSubject.onCompleted();
+
+        assertEquals(mListOne, Collections.singletonList(3));
+        assertEquals(mListTwo, Collections.singletonList(3));
+    }
+
+    /**
+     * @see <a href="http://reactivex.io/documentation/operators/images/S.AsyncSubject.e.png">AsyncSubject</a>
+     */
+    @Test
+    public void asyncSubject2() {
+
+        AsyncSubject<Integer> asyncSubject = AsyncSubject.create();
+
+        asyncSubject.subscribe(mListOne::add, throwable -> {
+            mListOne.add("error");
+        });
+        asyncSubject.delaySubscription(500, TimeUnit.MILLISECONDS, Schedulers.io())
+                .subscribe(mListTwo::add, throwable -> {
+                    mListTwo.add("error");
+                });
+
+        asyncSubject.onNext(1);
+        asyncSubject.onNext(2);
+        OperatorUtils.sleep(1000);
+        asyncSubject.onNext(3);
+        asyncSubject.onError(new Throwable());
+
+        assertEquals(mListOne, Collections.singletonList("error"));
+        assertEquals(mListTwo, Collections.singletonList("error"));
     }
 
     /**
@@ -78,7 +128,7 @@ public class SubjectTest {
                     mListTwo.add("error");
                 });
 
-        assertEquals(mListOne,Arrays.asList(1,2,"error"));
+        assertEquals(mListOne, Arrays.asList(1, 2, "error"));
         assertEquals(mListTwo, Collections.singletonList("error"));
 
     }
@@ -87,7 +137,7 @@ public class SubjectTest {
      * @see <a href="http://reactivex.io/documentation/operators/images/S.PublishSubject.png">PublishSubject</a>
      */
     @Test
-    public void publishSubject1(){
+    public void publishSubject1() {
 
         PublishSubject<Integer> publishSubject = PublishSubject.create();
 
@@ -106,7 +156,7 @@ public class SubjectTest {
         publishSubject.onNext(3);
         publishSubject.onCompleted();
 
-        assertEquals(mListOne,Arrays.asList(1,2,3));
+        assertEquals(mListOne, Arrays.asList(1, 2, 3));
         assertEquals(mListTwo, Collections.singletonList(3));
     }
 
@@ -114,17 +164,17 @@ public class SubjectTest {
      * @see <a href="http://reactivex.io/documentation/operators/images/S.PublishSubject.e.png">PublishSubject</a>
      */
     @Test
-    public void publicSubject2(){
+    public void publicSubject2() {
 
         PublishSubject<Integer> publishSubject = PublishSubject.create();
 
-        publishSubject.subscribe(mListOne::add,throwable -> {
+        publishSubject.subscribe(mListOne::add, throwable -> {
             mListOne.add("error");
         });
 
         //延迟500ms订阅
         publishSubject.delaySubscription(500, TimeUnit.MILLISECONDS, Schedulers.io())
-                .subscribe(mListTwo::add,throwable -> {
+                .subscribe(mListTwo::add, throwable -> {
                     mListTwo.add("error");
                 });
 
@@ -135,7 +185,28 @@ public class SubjectTest {
         OperatorUtils.sleep(1000);
         publishSubject.onError(new Throwable());
 
-        assertEquals(mListOne,Arrays.asList(1,2,"error"));
+        assertEquals(mListOne, Arrays.asList(1, 2, "error"));
         assertEquals(mListTwo, Collections.singletonList("error"));
+    }
+
+    /**
+     * @see <a href="http://reactivex.io/documentation/operators/images/S.ReplaySubject.png">ReplaySubject</a>
+     */
+    @Test
+    public void replaySubject() {
+        ReplaySubject<Integer> replaySubject = ReplaySubject.create();
+
+        replaySubject.subscribe(mListOne::add);
+        replaySubject.delaySubscription(500, TimeUnit.MILLISECONDS, Schedulers.io())
+                .subscribe(mListTwo::add);
+
+        replaySubject.onNext(1);
+        replaySubject.onNext(2);
+        OperatorUtils.sleep(1000);
+        replaySubject.onNext(3);
+        replaySubject.onCompleted();
+
+        assertEquals(mListOne, Arrays.asList(1, 2, 3));
+        assertEquals(mListTwo, Arrays.asList(1, 2, 3));
     }
 }
