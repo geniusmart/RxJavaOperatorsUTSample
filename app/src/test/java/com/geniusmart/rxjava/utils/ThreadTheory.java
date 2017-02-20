@@ -101,7 +101,6 @@ public class ThreadTheory {
 
         TestScheduler testScheduler = Schedulers.test();
         System.out.println("测试线程：" + Thread.currentThread().getName());
-        //消息源在Schedulers.computation()线程中执行，3s后执行，此时测试线程已经执行完毕，无法正常输出结果
         Observable.timer(3, TimeUnit.SECONDS, testScheduler)
                 .subscribe(num -> {
                     System.out.println("Observable和Subscriber线程：" + Thread.currentThread().getName());
