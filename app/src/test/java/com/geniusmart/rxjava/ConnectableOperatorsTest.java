@@ -98,7 +98,7 @@ public class ConnectableOperatorsTest {
                 .doOnNext(num -> System.out.println("Subscriber2-->" + num))
                 .subscribe(list2::add);
 
-        //延迟1s后再订阅，将只订阅到3的数据流
+        //延迟1s后再订阅，将订阅到1,2的数据流
         connectableObservable.delaySubscription(1, TimeUnit.SECONDS, Schedulers.newThread())
                 .doOnSubscribe(()->{
                     System.out.println("Subscriber3-1s后开始订阅数据");
@@ -190,7 +190,7 @@ public class ConnectableOperatorsTest {
      * 此方法与refCount2比对，展示hot与cold数据流的区别
      */
     @Test
-    public void without_public_and_refCount() {
+    public void without_publish_and_refCount() {
 
         List<Long> list1 = new ArrayList<>();
         List<Long> list2 = new ArrayList<>();
